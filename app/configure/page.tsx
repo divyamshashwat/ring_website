@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
-import Configurator from '@/components/configurator/Configurator';
+import ConfigureClient from './ConfigureClient';
 import { pageMetadata } from '@/lib/seo';
-import { configFromSearch } from '@/lib/store/configurator';
 
 export const metadata: Metadata = pageMetadata({
   title: 'Create Your Ring',
@@ -9,7 +8,6 @@ export const metadata: Metadata = pageMetadata({
   path: '/configure',
 });
 
-export default async function ConfigurePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const initial = configFromSearch(await searchParams);
-  return <Configurator initial={initial} syncUrl headingLevel="h1" />;
+export default function ConfigurePage() {
+  return <ConfigureClient />;
 }

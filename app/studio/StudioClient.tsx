@@ -8,8 +8,9 @@ import type { CameraStateName } from '@/lib/3d/cameraStates';
 
 const StudioScene = dynamic(() => import('@/components/3d/StudioScene'), { ssr: false });
 
-export default function StudioClient({ params }: { params: Record<string, string | undefined> }) {
+export default function StudioClient() {
   const [ready, setReady] = useState(false);
+  const [params] = useState<Record<string, string | undefined>>(() => (typeof window === 'undefined' ? {} : Object.fromEntries(new URLSearchParams(window.location.search))));
   const product = products.find((p) => p.slug === params.product);
   const config = product?.configuration ?? configFromSearch(params as Record<string, string>);
   return (
