@@ -1,0 +1,92 @@
+.footer {
+  background: var(--pearl);
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(80px, 12vw, 180px);
+  margin-top: 0;
+}
+.statement {
+  grid-column: 1 / span 7;
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(2.6rem, 5.2vw, 5.6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.statement em {
+  font-style: italic;
+  color: var(--gold);
+}
+.aside {
+  grid-column: 9 / span 4;
+  align-self: end;
+  display: grid;
+  gap: 22px;
+}
+.cols {
+  margin-top: clamp(72px, 9vw, 140px);
+  padding-top: 40px;
+  border-top: 1px solid var(--hairline);
+  row-gap: 40px;
+}
+.col {
+  grid-column: span 3;
+}
+.col h2 {
+  margin-bottom: 18px;
+}
+.col li a {
+  display: inline-block;
+  padding: 5px 0;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--ink-soft);
+  transition: color 0.4s, transform 0.6s var(--ease);
+}
+.col li a:hover {
+  color: var(--ink);
+  transform: translateX(4px);
+}
+.legal {
+  margin-top: 72px;
+  padding-block: 28px;
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  justify-content: space-between;
+  align-items: center;
+}
+.legal nav {
+  display: flex;
+  gap: 24px;
+}
+.wordmarkGiant {
+  margin-top: clamp(48px, 8vw, 120px);
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(5rem, 21vw, 22rem);
+  line-height: 0.78;
+  letter-spacing: 0.08em;
+  color: var(--champagne);
+  text-align: center;
+  user-select: none;
+  overflow: hidden;
+  padding-bottom: 0.04em;
+}
+@media (max-width: 1023px) {
+  .statement {
+    grid-column: 1 / -1;
+  }
+  .aside {
+    grid-column: 1 / -1;
+    margin-top: 40px;
+  }
+  .col {
+    grid-column: span 6;
+  }
+}
+@media (max-width: 560px) {
+  .col {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,0 +1,265 @@
+.hero {
+  position: relative;
+  height: 430vh;
+  background: var(--ivory);
+}
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+}
+.canvas canvas {
+  touch-action: pan-y;
+}
+/* the warm pool of light the ring floats in */
+.glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 55% at 68% 52%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
+  pointer-events: none;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.layer a,
+.layer button {
+  pointer-events: auto;
+}
+.intro {
+  position: absolute;
+  left: var(--margin);
+  top: 50%;
+  transform: translateY(-46%);
+  width: min(560px, 42vw);
+  display: grid;
+  gap: 30px;
+}
+.title {
+  font-size: clamp(3.2rem, 6.1vw, 6.6rem);
+}
+.title em {
+  font-style: italic;
+  font-weight: 300;
+}
+.copy {
+  max-width: 25.5em;
+}
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 32px;
+  margin-top: 8px;
+}
+.label {
+  position: absolute;
+  right: var(--margin);
+  bottom: 40px;
+  text-align: right;
+  display: grid;
+  gap: 6px;
+}
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #b4442c;
+  margin-right: 10px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 4px rgba(180, 68, 44, 0.12);
+}
+.scroll {
+  position: absolute;
+  left: var(--margin);
+  bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.scrollLine {
+  position: relative;
+  width: 56px;
+  height: 1px;
+  background: var(--hairline-strong);
+  overflow: hidden;
+}
+.scrollLine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: translateX(-100%);
+  animation: travel 2.6s var(--ease-in-out) infinite;
+}
+@keyframes travel {
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+.caption {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  transform: translateX(-50%);
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+}
+.macro {
+  position: absolute;
+  left: var(--margin);
+  bottom: 14vh;
+  max-width: 300px;
+  opacity: 0;
+}
+.stoneTitle {
+  position: absolute;
+  left: var(--margin);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(440px, 34vw);
+}
+.stoneTitle :global(.eyebrow) {
+  margin-bottom: 26px;
+  opacity: 0;
+}
+.panel {
+  position: absolute;
+  right: var(--margin);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(320px, 26vw);
+  opacity: 0;
+}
+.panel dl {
+  display: grid;
+  border-top: 1px solid var(--hairline-strong);
+}
+.panel dl > div {
+  display: grid;
+  grid-template-columns: 7.5em 1fr;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--fs-small);
+}
+.panel dt {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.panel dd {
+  color: var(--ink);
+  font-weight: 300;
+}
+.panelHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.note {
+  margin-top: 16px;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+.drag {
+  position: absolute;
+  left: 50%;
+  bottom: 7vh;
+  transform: translateX(-50%);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.dragArrows {
+  display: inline-flex;
+  gap: 4px;
+}
+.rail {
+  position: absolute;
+  right: calc(var(--margin) * 0.45);
+  top: 50%;
+  height: 120px;
+  width: 1px;
+  transform: translateY(-50%);
+  background: var(--hairline);
+}
+.railFill {
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+}
+
+@media (max-width: 819px) {
+  .glow {
+    background: radial-gradient(80% 45% at 50% 32%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
+  }
+  .intro {
+    left: var(--margin);
+    right: var(--margin);
+    top: auto;
+    bottom: 13vh;
+    transform: none;
+    width: auto;
+    gap: 18px;
+  }
+  .title {
+    font-size: clamp(2.7rem, 11.5vw, 3.6rem);
+  }
+  .copy {
+    display: none;
+  }
+  .label {
+    display: none;
+  }
+  .scroll {
+    bottom: 28px;
+  }
+  .stoneTitle {
+    top: calc(var(--header-h) + 24px);
+    transform: none;
+    width: auto;
+    right: var(--margin);
+  }
+  .panel {
+    top: auto;
+    bottom: 5vh;
+    transform: none;
+    left: var(--margin);
+    right: var(--margin);
+    width: auto;
+  }
+  .panel dl > div {
+    padding: 8px 0;
+  }
+  .note,
+  .drag,
+  .rail {
+    display: none;
+  }
+  .caption {
+    bottom: 6vh;
+    white-space: normal;
+    width: 80vw;
+  }
+  .macro {
+    bottom: 8vh;
+    right: var(--margin);
+  }
+}

@@ -1,0 +1,470 @@
+/* ==========================================================================
+   VYOMA — design tokens
+   Light only. Warm ivory, restrained ink, gold used as a physical accent.
+   ========================================================================== */
+:root {
+  --ivory: #f8f7f3;
+  --porcelain: #fbfaf7;
+  --pearl: #f3f0e9;
+  --champagne: #ece4d5;
+  --sand: #e2d8c6;
+  --warm-grey: #d8d2c8;
+  --stone: #8b847a;
+  --muted: #6f6861;
+  --ink-soft: #46413b;
+  --ink: #1a1815;
+  --gold: #9a7b46;
+  --gold-soft: #b89a66;
+  --hairline: rgba(26, 24, 21, 0.12);
+  --hairline-strong: rgba(26, 24, 21, 0.24);
+  --gold-line: rgba(154, 123, 70, 0.5);
+
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-sans: var(--font-jost), 'Jost', 'Helvetica Neue', Arial, sans-serif;
+
+  --fs-display: clamp(2.9rem, 5.6vw, 6.25rem);
+  --fs-h1: clamp(2.5rem, 4.4vw, 4.6rem);
+  --fs-h2: clamp(2.05rem, 3.3vw, 3.5rem);
+  --fs-h3: clamp(1.55rem, 2.1vw, 2.15rem);
+  --fs-lead: clamp(1.15rem, 1.35vw, 1.4rem);
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-micro: 0.6875rem;
+
+  --margin: clamp(20px, 5.2vw, 96px);
+  --gutter: clamp(16px, 2.2vw, 36px);
+  --header-h: 76px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  color-scheme: light;
+}
+
+@media (max-width: 767px) {
+  :root {
+    --header-h: 64px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  background: var(--ivory);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ul,
+ol {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+::selection {
+  background: var(--champagne);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* ---------- typography primitives ---------- */
+.serif {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  letter-spacing: -0.012em;
+  line-height: 1.02;
+}
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--fs-display);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+
+.h1 {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--fs-h1);
+  line-height: 1.02;
+  letter-spacing: -0.016em;
+}
+
+.h2 {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: var(--fs-h2);
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+}
+
+.h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: var(--fs-h3);
+  line-height: 1.12;
+  letter-spacing: -0.005em;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  font-weight: 300;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.micro {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.body {
+  font-size: var(--fs-body);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  font-weight: 300;
+  max-width: 34em;
+}
+
+.small {
+  font-size: var(--fs-small);
+  line-height: 1.6;
+}
+
+.balance {
+  text-wrap: balance;
+}
+
+.pretty {
+  text-wrap: pretty;
+}
+
+/* ---------- layout ---------- */
+.container {
+  width: 100%;
+  padding-inline: var(--margin);
+  margin-inline: auto;
+  max-width: 1920px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+.rule {
+  height: 1px;
+  background: var(--hairline);
+  border: 0;
+  margin: 0;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+  padding: 12px 18px;
+  background: var(--ink);
+  color: var(--ivory);
+  font-size: var(--fs-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform 0.3s var(--ease);
+}
+.skip-link:focus {
+  transform: none;
+}
+
+/* ---------- controls ---------- */
+.btn {
+  --h: 54px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: var(--h);
+  padding: 0 30px;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  border: 1px solid var(--ink);
+  color: var(--ink);
+  background: transparent;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.6s var(--ease), border-color 0.6s var(--ease);
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  transition: transform 0.6s var(--ease);
+}
+.btn:hover {
+  color: var(--ivory);
+}
+.btn:hover::before {
+  transform: scaleY(1);
+}
+.btn--solid {
+  background: var(--ink);
+  color: var(--ivory);
+}
+.btn--solid::before {
+  background: var(--gold);
+}
+.btn--solid:hover {
+  border-color: var(--gold);
+}
+.btn--block {
+  width: 100%;
+}
+.btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* the house text link: a hairline that draws itself */
+.link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-micro);
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding-block: 6px;
+}
+.link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform-origin: 100% 50%;
+  transition: transform 0.7s var(--ease);
+}
+.link:hover::after {
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  animation: link-redraw 0.9s var(--ease) 0.15s forwards;
+}
+@keyframes link-redraw {
+  from {
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+  }
+  to {
+    transform: scaleX(1);
+    transform-origin: 0 50%;
+  }
+}
+.link--quiet::after {
+  opacity: 0.35;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+.field label,
+.field .label {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding: 12px 0;
+  font-size: 1.05rem;
+  font-weight: 300;
+  border-radius: 0;
+  outline: none;
+  transition: border-color 0.4s var(--ease);
+  appearance: none;
+}
+.field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-bottom-color: var(--ink);
+}
+
+/* ---------- motion helpers ---------- */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line-mask > span {
+  display: block;
+  will-change: transform;
+}
+
+[data-reveal] {
+  opacity: 0;
+}
+.no-js [data-reveal],
+.reduced-motion [data-reveal] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* custom cursor only on fine pointers */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button,
+  html.has-cursor [role='button'],
+  html.has-cursor label {
+    cursor: none;
+  }
+  html.has-cursor input,
+  html.has-cursor textarea,
+  html.has-cursor select {
+    cursor: text;
+  }
+}

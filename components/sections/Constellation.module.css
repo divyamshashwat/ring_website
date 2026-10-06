@@ -1,0 +1,129 @@
+.section {
+  position: relative;
+  padding-top: clamp(100px, 14vw, 200px);
+  background: linear-gradient(180deg, var(--ivory) 0%, var(--porcelain) 40%, var(--pearl) 100%);
+}
+.head {
+  align-items: end;
+  row-gap: 28px;
+}
+.title {
+  grid-column: 1 / span 7;
+}
+.intro {
+  grid-column: 9 / span 4;
+}
+.stage {
+  position: relative;
+  height: min(78vh, 760px);
+  margin-top: clamp(24px, 4vw, 60px);
+}
+.stage canvas {
+  touch-action: pan-y;
+}
+.legend {
+  position: absolute;
+  left: var(--margin);
+  top: 4%;
+  display: grid;
+  gap: 6px;
+  pointer-events: none;
+}
+.legend span::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 1px;
+  background: currentColor;
+  vertical-align: middle;
+  margin-right: 10px;
+  opacity: 0.5;
+}
+.focus {
+  position: relative;
+  min-height: 120px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--hairline);
+}
+.focusName {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.focusName strong {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  line-height: 1;
+}
+.focusMeta {
+  margin-top: 10px;
+}
+.hint {
+  color: var(--muted);
+}
+.index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  padding-block: 22px clamp(80px, 10vw, 140px);
+}
+.index li {
+  display: contents;
+}
+.index button {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--muted);
+  padding: 10px 18px 10px 0;
+  margin-right: 18px;
+  position: relative;
+  transition: color 0.4s;
+}
+.index button::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background: var(--sw);
+  vertical-align: 0;
+  transform: scale(0.6);
+  transition: transform 0.5s var(--ease);
+}
+.index button[data-active='true'],
+.index button:hover {
+  color: var(--ink);
+}
+.index button[data-active='true']::before {
+  transform: scale(1);
+}
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--hairline-strong);
+  margin: 0 22px 0 4px;
+}
+@media (max-width: 900px) {
+  .title,
+  .intro {
+    grid-column: 1 / -1;
+  }
+  .stage {
+    height: 82vh;
+  }
+  .legend {
+    display: none;
+  }
+  .focus {
+    grid-template-columns: 1fr;
+  }
+}
