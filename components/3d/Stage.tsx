@@ -7,6 +7,9 @@ import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
 import { report, setGpu } from '@/lib/diag';
+import { patchWebGLForPrivacyBrowsers } from '@/lib/3d/webglCompat';
+
+patchWebGLForPrivacyBrowsers();
 
 interface StageProps {
   children: ReactNode;
@@ -59,6 +62,7 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
 let webglSupport: boolean | null = null;
 function supportsWebGL2() {
   if (webglSupport !== null) return webglSupport;
+  patchWebGLForPrivacyBrowsers();
   try {
     const c = document.createElement('canvas');
     const gl = c.getContext('webgl2');
