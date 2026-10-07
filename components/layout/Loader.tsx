@@ -8,8 +8,11 @@ import { useLenis } from './SmoothScroll';
 import Wordmark from './Wordmark';
 
 /**
- * First-visit preparation screen for the 3D home page: the wordmark, one line
- * of copy, and a hairline that fills as the ring's assets arrive.
+ * The home page's preparation screen. Its progress is real, built from the
+ * actual loading steps:
+ *   fonts 10% · 3D code and canvas 15% · model and decoder downloads 55% · first rendered frame 20%
+ * It closes the moment the ring has rendered — or has fallen back to its still —
+ * never on a timer. A 15 s safety net only guards against a stalled network.
  */
 export default function Loader() {
   const pathname = usePathname();
@@ -22,53 +25,41 @@ export default function Loader() {
 
   useEffect(() => {
     if (!active) return;
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem('vyoma-prepared') === '1';
-    } catch {}
     lenis?.stop();
+    let fonts = false;
+    const draw = () => line.current && (line.current.style.transform = `scaleX(${shown.current.v})`);
     const finish = () => {
       if (done.current) return;
       done.current = true;
-      try {
-        sessionStorage.setItem('vyoma-prepared', '1');
-      } catch {}
       gsap
         .timeline({ onComplete: () => setActive(false) })
-        .to(shown.current, { v: 1, duration: 0.6, ease: 'power2.out', onUpdate: () => line.current && (line.current.style.transform = `scaleX(${shown.current.v})`) })
-        .to(root.current!.querySelectorAll('[data-fade]'), { opacity: 0, y: -8, duration: 0.7, ease: 'power2.in', stagger: 0.05 }, '+=0.15')
-        .to(root.current, { opacity: 0, duration: 1.1, ease: 'power2.inOut', onStart: () => lenis?.start() }, '-=0.2');
+        .to(shown.current, { v: 1, duration: 0.45, ease: 'power2.out', onUpdate: draw, overwrite: true })
+        .to(root.current!.querySelectorAll('[data-fade]'), { opacity: 0, y: -8, duration: 0.6, ease: 'power2.in', stagger: 0.05 }, '+=0.1')
+        .to(root.current, { opacity: 0, duration: 0.9, ease: 'power2.inOut', onStart: () => lenis?.start() }, '-=0.2');
     };
-    const unsub = useUI.subscribe((s) => {
-      const target = Math.max(s.progress * 0.85, s.sceneReady ? 1 : 0);
-      gsap.to(shown.current, {
-        v: target,
-        duration: 1.2,
-        ease: 'power3.out',
-        overwrite: true,
-        onUpdate: () => line.current && (line.current.style.transform = `scaleX(${shown.current.v})`),
-      });
-      if (s.sceneReady) finish();
+    const update = () => {
+      const s = useUI.getState();
+      if (s.sceneReady) return finish();
+      const target = (fonts ? 0.1 : 0) + (s.sceneMounted ? 0.15 : 0) + s.progress * 0.55;
+      gsap.to(shown.current, { v: Math.min(target, 0.8), duration: 0.8, ease: 'power3.out', overwrite: true, onUpdate: draw });
+    };
+    document.fonts?.ready.then(() => {
+      fonts = true;
+      update();
     });
-    if (useUI.getState().sceneReady) finish();
-    // never hold the visitor: a returning visit or a slow device continues regardless
-    const touch = window.matchMedia('(pointer: coarse)').matches;
-    const timeout = setTimeout(finish, seen ? 1200 : touch ? 4000 : 7000);
+    const unsub = useUI.subscribe(update);
+    update();
+    const safety = setTimeout(finish, 15000);
     return () => {
       unsub();
-      clearTimeout(timeout);
+      clearTimeout(safety);
       lenis?.start();
     };
   }, [active, lenis]);
 
   if (!active) return null;
   return (
-    <div
-      ref={root}
-      role="status"
-      aria-live="polite"
-      style={{ position: 'fixed', inset: 0, zIndex: 950, background: 'var(--ivory)', display: 'grid', placeItems: 'center' }}
-    >
+    <div ref={root} role="status" aria-live="polite" aria-label="Loading" style={{ position: 'fixed', inset: 0, zIndex: 950, background: 'var(--ivory)', display: 'grid', placeItems: 'center' }}>
       <div style={{ display: 'grid', justifyItems: 'center', gap: 28, width: 'min(280px, 70vw)' }}>
         <div data-fade>
           <Wordmark />

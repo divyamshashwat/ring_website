@@ -153,8 +153,10 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
 
 export default function HeroScene({ driver, className }: { driver: HeroDriver; className?: string }) {
   const setSceneReady = useUI((s) => s.setSceneReady);
+  const setSceneMounted = useUI((s) => s.setSceneMounted);
+  useEffect(() => setSceneMounted(), [setSceneMounted]);
   return (
-    <Stage className={className} style={{ width: '100%', height: '100%' }} fallback={<ProductStill slug="moonga-ring" />} camera={{ position: [0, 0.55, 7.6], fov: 26 }} onReady={setSceneReady} ariaLabel="The Moonga Ring in 22K yellow gold, an interactive 3D model">
+    <Stage className={className} style={{ width: '100%', height: '100%' }} fallback={<ProductStill slug="moonga-ring" />} onFail={setSceneReady} camera={{ position: [0, 0.55, 7.6], fov: 26 }} onReady={setSceneReady} ariaLabel="The Moonga Ring in 22K yellow gold, an interactive 3D model">
       <MaterialLibraryProvider metal="yellow-gold" purity="22k">
         <StudioEnvironment />
         <LightingRig follow={0.22} drift={0.05} />

@@ -7,7 +7,7 @@ import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
 import { report, setGpu } from '@/lib/diag';
-import { patchWebGLForPrivacyBrowsers } from '@/lib/3d/webglCompat';
+import { createHardenedRenderer, patchWebGLForPrivacyBrowsers } from '@/lib/3d/webglCompat';
 
 patchWebGLForPrivacyBrowsers();
 
@@ -25,6 +25,8 @@ interface StageProps {
   ariaLabel?: string;
   /** shown instead of the 3D scene when WebGL is unavailable, fails, or the GPU drops the context */
   fallback?: ReactNode;
+  /** called if the scene ends up showing its fallback */
+  onFail?: () => void;
 }
 
 function ReadySignal({ onReady }: { onReady?: () => void }) {
@@ -91,7 +93,7 @@ function supportsWebGL2() {
  *  - if WebGL is missing, a scene throws, or the GPU drops the context, the
  *    fallback is shown and the rest of the page keeps working
  */
-export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null }: StageProps) {
+export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null, onFail }: StageProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [tier, setTier] = useState<QualityTier>('high');
   const [mounted, setMounted] = useState(false);
@@ -134,6 +136,10 @@ export default function Stage({ children, className, style, camera = { position:
     };
   }, [persistent]);
 
+  useEffect(() => {
+    if (failed) onFail?.();
+  }, [failed, onFail]);
+
   const q = QUALITY[tier];
   return (
     <div ref={ref} className={className} style={{ position: 'relative', ...style }} role={ariaLabel ? 'img' : undefined} aria-label={ariaLabel}>
@@ -144,7 +150,7 @@ export default function Stage({ children, className, style, camera = { position:
             dpr={dpr}
             frameloop={visible && !paused ? 'always' : 'never'}
             camera={{ position: camera.position, fov: camera.fov, near: 0.1, far: 100 }}
-            gl={{ antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false }}
+            gl={(defaults) => createHardenedRenderer(defaults.canvas as HTMLCanvasElement, { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })}
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0);
               gl.toneMapping = NeutralToneMapping;
