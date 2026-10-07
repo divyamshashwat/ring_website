@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import gsap from 'gsap';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { TransitionLink } from '@/components/layout/PageTransition';
+import { useLenis } from '@/components/layout/SmoothScroll';
 import { MaskedLines } from '@/components/ui/Reveal';
 import { findStone, isValidDate, type FinderResult } from '@/lib/astro/finder';
 import { INTENTIONS } from '@/lib/data/options';
@@ -60,9 +61,22 @@ export default function FindYourStone({ headingLevel = 'h2' }: { headingLevel?: 
     });
   };
 
+  // every new question starts in view, just below the header (on phones it would otherwise open above the screen)
+  const lenis = useLenis();
+  const firstStep = useRef(true);
   useEffect(() => {
-    if (step === 3) root.current?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
-  }, [step]);
+    if (firstStep.current) {
+      firstStep.current = false;
+      return;
+    }
+    const el = root.current;
+    if (!el) return;
+    const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64;
+    const top = el.getBoundingClientRect().top;
+    if (step !== 3 && top >= header - 2 && top < window.innerHeight * 0.4) return;
+    if (lenis) lenis.scrollTo(el, { offset: -header, immediate: prefersReducedMotion() });
+    else window.scrollTo({ top: window.scrollY + top - header, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  }, [step, lenis]);
 
   const submitDate = () => {
     const d = Number(day);

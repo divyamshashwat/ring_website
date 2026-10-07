@@ -38,7 +38,7 @@ export default function ProductIndex({ products }: { products: Product[] }) {
           return (
             <li key={p.slug} className={styles.row} style={{ ['--sw' as string]: gem.swatch }}>
               <TransitionLink href={`/products/${p.slug}`} className={styles.media} stoneColor={gem.swatch} data-cursor="view" aria-label={`View ${p.name}`}>
-                <ProductImage product={p} priority={i < 2} sizes="(max-width: 900px) 100vw, 58vw" />
+                <ProductImage product={p} priority={i < 2} sizes="(max-width: 600px) 50vw, (max-width: 900px) 100vw, 58vw" />
               </TransitionLink>
               <div className={styles.text}>
                 <h2 className={styles.name}>{gem.name}</h2>
@@ -49,8 +49,8 @@ export default function ProductIndex({ products }: { products: Product[] }) {
                   <span>Natural {gem.englishName}</span>
                   <span>Certified</span>
                 </div>
-                <p className="body small">{p.description}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 28, flexWrap: 'wrap' }}>
+                <p className={`body small ${styles.desc}`}>{p.description}</p>
+                <div className={styles.buy}>
                   <TransitionLink href={`/products/${p.slug}`} className="link" stoneColor={gem.swatch}>
                     Explore
                   </TransitionLink>

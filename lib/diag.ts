@@ -50,7 +50,19 @@ export function subscribeDiag(l: () => void) {
   };
 }
 
+/** ?debug turns the on-screen panel on for the rest of this tab's session (pages may rewrite their URL). */
+export function debugEnabled() {
+  try {
+    return sessionStorage.getItem('vyoma-debug') === '1';
+  } catch {
+    return new URLSearchParams(location.search).has('debug');
+  }
+}
+
 if (typeof window !== 'undefined') {
+  try {
+    if (new URLSearchParams(location.search).has('debug')) sessionStorage.setItem('vyoma-debug', '1');
+  } catch {}
   try {
     const prev = JSON.parse(sessionStorage.getItem(KEY) ?? 'null') as { path: string; clean: boolean; events: DiagEvent[] } | null;
     if (prev && !prev.clean && prev.events.length) state.previous = { path: prev.path, events: prev.events };

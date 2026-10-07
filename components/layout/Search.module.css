@@ -77,6 +77,8 @@
   font-size: 0.98rem;
   transition: padding 0.5s var(--ease), color 0.4s;
 }
-.group li a:hover {
-  padding-left: 8px;
+@media (hover: hover) and (pointer: fine) {
+  .group li a:hover {
+    padding-left: 8px;
+  }
 }

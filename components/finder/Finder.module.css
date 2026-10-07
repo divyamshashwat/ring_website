@@ -95,10 +95,15 @@
   transition: padding 0.7s var(--ease), color 0.4s;
   color: var(--ink-soft);
 }
-.choice:hover,
 .choice[aria-checked='true'] {
   padding-left: 14px;
   color: var(--ink);
+}
+@media (hover: hover) and (pointer: fine) {
+  .choice:hover {
+    padding-left: 14px;
+    color: var(--ink);
+  }
 }
 .choice strong {
   font-family: var(--font-serif);

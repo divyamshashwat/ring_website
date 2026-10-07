@@ -1,6 +1,8 @@
 'use client';
 
 import Image from 'next/image';
+import { useRef } from 'react';
+import StickyBuy from './StickyBuy';
 import { TransitionLink } from '@/components/layout/PageTransition';
 import { configurationName } from '@/components/configurator/Configurator';
 import { gemstoneBySlug } from '@/lib/data/gemstones';
@@ -33,6 +35,8 @@ export default function BagView() {
   const items = useBag((s) => s.items);
   const remove = useBag((s) => s.remove);
   const setQuantity = useBag((s) => s.setQuantity);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
   if (!mounted) return <div style={{ minHeight: '40vh' }} />;
 
   if (items.length === 0) {
@@ -52,7 +56,7 @@ export default function BagView() {
   }
   const total = bagTotal(items);
   return (
-    <div className={styles.layout}>
+    <div ref={layoutRef} className={styles.layout}>
       <ul className={styles.lines}>
         {items.map((item) => (
           <li key={item.key} className={styles.line}>
@@ -79,7 +83,7 @@ export default function BagView() {
           </li>
         ))}
       </ul>
-      <aside className={styles.summary} aria-label="Summary">
+      <aside ref={summaryRef} className={styles.summary} aria-label="Summary">
         <p className="label">Summary</p>
         <div className={styles.row}>
           <span>Subtotal</span>
@@ -102,6 +106,7 @@ export default function BagView() {
         </TransitionLink>
         <p className="small muted">Prices include GST. Made-to-order pieces are confirmed by a gemmologist before payment is taken.</p>
       </aside>
+      <StickyBuy within={layoutRef} target={summaryRef} name="Total" price={formatPrice(total)} href="/checkout" action="Checkout" />
     </div>
   );
 }

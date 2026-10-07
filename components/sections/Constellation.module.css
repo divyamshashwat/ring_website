@@ -125,5 +125,25 @@
   }
   .focus {
     grid-template-columns: 1fr;
+    gap: 16px;
+    min-height: 168px;
+  }
+  .focusName {
+    gap: 6px 16px;
+  }
+  .index {
+    gap: 0;
+    padding-block: 16px 72px;
+  }
+  .index button {
+    min-height: 44px;
+    padding: 0 14px 0 0;
+    margin-right: 10px;
+  }
+  .divider {
+    flex-basis: 100%;
+    height: 1px;
+    width: auto;
+    margin: 8px 0;
   }
 }

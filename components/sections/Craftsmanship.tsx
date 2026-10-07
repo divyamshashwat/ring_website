@@ -87,8 +87,8 @@ export default function Craftsmanship() {
           apply(self.progress);
         },
       });
-      // the bench photographs drift slowly sideways as the page moves
-      if (track.current && strip.current && !prefersReducedMotion()) {
+      // the bench photographs drift slowly sideways as the page moves (phones swipe them instead)
+      if (track.current && strip.current && !prefersReducedMotion() && window.innerWidth > 900) {
         gsap.fromTo(track.current, { xPercent: 4 }, { xPercent: -18, ease: 'none', scrollTrigger: { trigger: strip.current, start: 'top bottom', end: 'bottom top', scrub: 1 } });
       }
     });

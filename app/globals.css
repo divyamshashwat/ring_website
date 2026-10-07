@@ -42,6 +42,8 @@
 @media (max-width: 767px) {
   :root {
     --header-h: 64px;
+    /* tracked capitals need a little more size to stay legible on a phone */
+    --fs-micro: 0.75rem;
   }
 }
 
@@ -259,6 +261,8 @@ cite,
 
 .visually-hidden {
   position: absolute !important;
+  top: 0;
+  left: 0;
   width: 1px;
   height: 1px;
   padding: 0;
@@ -319,12 +323,6 @@ cite,
   transform-origin: 50% 100%;
   transition: transform 0.6s var(--ease);
 }
-.btn:hover {
-  color: var(--ivory);
-}
-.btn:hover::before {
-  transform: scaleY(1);
-}
 .btn--solid {
   background: var(--ink);
   color: var(--ivory);
@@ -332,8 +330,20 @@ cite,
 .btn--solid::before {
   background: var(--gold);
 }
-.btn--solid:hover {
-  border-color: var(--gold);
+/* hover effects only where there is a real hover: on touch screens they would stick after a tap */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    color: var(--ivory);
+  }
+  .btn:hover::before {
+    transform: scaleY(1);
+  }
+  .btn--solid:hover {
+    border-color: var(--gold);
+  }
+}
+.btn:active {
+  opacity: 0.85;
 }
 .btn--block {
   width: 100%;
@@ -366,10 +376,20 @@ cite,
   transform-origin: 100% 50%;
   transition: transform 0.7s var(--ease);
 }
-.link:hover::after {
-  transform: scaleX(0);
-  transform-origin: 100% 50%;
-  animation: link-redraw 0.9s var(--ease) 0.15s forwards;
+@media (hover: hover) and (pointer: fine) {
+  .link:hover::after {
+    transform: scaleX(0);
+    transform-origin: 100% 50%;
+    animation: link-redraw 0.9s var(--ease) 0.15s forwards;
+  }
+}
+/* touch: the tappable area of a text link reaches 44px without moving its hairline */
+@media (pointer: coarse) {
+  .link::before {
+    content: '';
+    position: absolute;
+    inset: -8px -6px;
+  }
 }
 @keyframes link-redraw {
   from {
@@ -469,5 +489,14 @@ cite,
   html.has-cursor textarea,
   html.has-cursor select {
     cursor: text;
+  }
+}
+
+/* touch: small utility links (size guide, breadcrumbs) get a full-size target */
+@media (pointer: coarse) {
+  a.micro {
+    display: inline-block;
+    padding-block: 12px;
+    margin-block: -12px;
   }
 }

@@ -146,7 +146,7 @@ export default function Hero() {
         });
         const cam = driver.camera;
         // 1 — the intro dissolves
-        tl.to(q('[data-intro]'), { opacity: 0, y: -40, duration: 0.1, stagger: 0.012, ease: 'power2.in' }, 0.07)
+        tl.to(q('[data-intro]'), { autoAlpha: 0, y: -40, duration: 0.1, stagger: 0.012, ease: 'power2.in' }, 0.07)
           .to(q(`.${styles.scroll}`), { opacity: 0, duration: 0.05 }, 0.05)
           // 2 — the ring comes to centre, the camera draws closer, the ring turns
           .to(cam, { ...poseToDriver(P.centre), duration: 0.32, ease: 'expo.inOut' }, 0.1)
@@ -160,6 +160,7 @@ export default function Hero() {
           .to(cam, { ...poseToDriver(P.stone), duration: 0.2, ease: 'expo.inOut' }, 0.62)
           .fromTo(q('[data-stone-line]'), { yPercent: 112 }, { yPercent: 0, duration: 0.08, stagger: 0.015, ease: 'expo.out' }, 0.74)
           .fromTo(q(`.${styles.panel}`), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.08, ease: 'power3.out' }, 0.79)
+          .fromTo(q('[data-stone-meta]'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.08, ease: 'power3.out' }, 0.79)
           .set(driver, { interactive: 1 }, 0.8)
           .to({}, { duration: 0.1 }, 0.9);
       }, el);
@@ -236,6 +237,16 @@ export default function Hero() {
                 </span>
               </span>
             </h2>
+            {/* phones: the essentials of the panel, under the title */}
+            <div className={styles.stoneMobile} data-stone-meta>
+              <p className="small">
+                {stone.englishName} · {stone.name} · approx. {product.stoneDetails.weightCarats.toFixed(2)} ct
+              </p>
+              <p className="small muted">Traditionally associated with Mars. Drag the stone to turn it.</p>
+              <TransitionLink href={`/products/${product.slug}`} className="link" stoneColor={stone.swatch}>
+                View the Moonga Ring
+              </TransitionLink>
+            </div>
           </div>
 
           <aside className={styles.panel} aria-label="About this stone">

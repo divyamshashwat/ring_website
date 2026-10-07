@@ -64,7 +64,7 @@
 }
 .size small {
   display: block;
-  font-size: 0.64rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 .size[aria-checked='true'] {
@@ -191,5 +191,21 @@
   }
   .related {
     grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .viewer {
+    height: 54svh;
+  }
+  .related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 14px;
+  }
+  .related :global(.h3) {
+    font-size: 1.25rem;
+  }
+  .crumbs a {
+    display: inline-block;
+    padding-block: 12px;
   }
 }

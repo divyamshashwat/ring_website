@@ -56,6 +56,7 @@ export default function ZodiacPage() {
           .rashis li:hover { background: var(--porcelain); }
           .rashis .nm { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; }
           .rashis .stone { font-size: var(--fs-small); }
+          @media (pointer: coarse) { .rashis .stone { display: inline-block; padding-block: 11px; } }
           .rashis .stone:hover { text-decoration: underline; text-underline-offset: 4px; }
           .rashis .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; vertical-align: 1px; }
           @media (max-width: 900px) { .rashis li { grid-template-columns: 2.4em 1fr; } .rashis li > :nth-child(n+3) { grid-column: 2; } }

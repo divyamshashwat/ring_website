@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getDiag, subscribeDiag } from '@/lib/diag';
+import { debugEnabled, getDiag, subscribeDiag } from '@/lib/diag';
 import { detectQuality } from '@/lib/3d/quality';
 
 /** On-screen 3D diagnostics, only when the URL contains ?debug. */
@@ -11,7 +11,7 @@ export default function Diagnostics() {
   const [copied, setCopied] = useState(false);
   const [, force] = useState(0);
   useEffect(() => {
-    setOn(new URLSearchParams(window.location.search).has('debug'));
+    setOn(debugEnabled() || new URLSearchParams(window.location.search).has('debug'));
     return subscribeDiag(() => force((n) => n + 1));
   }, []);
   if (!on) return null;

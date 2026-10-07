@@ -12,7 +12,7 @@ import Wordmark from './Wordmark';
  * actual loading steps:
  *   fonts 10% · 3D code and canvas 15% · model and decoder downloads 55% · first rendered frame 20%
  * It closes the moment the ring has rendered — or has fallen back to its still —
- * never on a timer. A 15 s safety net only guards against a stalled network.
+ * never on a timer. A 10 s safety net only guards against a stalled network.
  */
 export default function Loader() {
   const pathname = usePathname();
@@ -49,7 +49,7 @@ export default function Loader() {
     });
     const unsub = useUI.subscribe(update);
     update();
-    const safety = setTimeout(finish, 15000);
+    const safety = setTimeout(finish, 10000);
     return () => {
       unsub();
       clearTimeout(safety);

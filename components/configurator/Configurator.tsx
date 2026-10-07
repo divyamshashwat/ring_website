@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import StickyBuy from '@/components/commerce/StickyBuy';
 import { TransitionLink } from '@/components/layout/PageTransition';
 import { gemstoneBySlug, gemstones, NAVRATNA_ORDER } from '@/lib/data/gemstones';
 import { METAL_OPTIONS, PURITY_OPTIONS, purityAvailable, RING_SIZES, STONE_SIZE_OPTIONS, STYLE_OPTIONS } from '@/lib/data/options';
@@ -47,6 +48,8 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
   const add = useBag((s) => s.add);
   const [tab, setTab] = useState<Tab>('stone');
   const [copied, setCopied] = useState(false);
+  const rootRef = useRef<HTMLElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initial) replace(initial);
@@ -81,7 +84,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
   const group = (id: Tab | null) => ({ 'data-tab': id ?? undefined, 'data-open': id === null || tab === id ? 'true' : 'false' });
 
   return (
-    <section className={styles.root} aria-labelledby="configurator-title">
+    <section ref={rootRef} className={styles.root} aria-labelledby="configurator-title">
       <div className={styles.stage}>
         <div className={styles.stageMeta} aria-hidden="true">
           <span className={styles.stageName}>{name}</span>
@@ -254,7 +257,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
           </p>
         </div>
 
-        <div className={styles.summary}>
+        <div ref={summaryRef} className={styles.summary}>
           <div className={styles.price}>
             <span className="label">Indicative price</span>
             <strong>{formatPrice(price)}</strong>
@@ -273,6 +276,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
           <p className={styles.note}>Final price is confirmed once your stone is selected. Made to order in 3–4 weeks.</p>
         </div>
       </div>
+      <StickyBuy within={rootRef} target={summaryRef} name={name} price={formatPrice(price)} onAdd={() => add({ name, configuration: { ...config }, price })} />
     </section>
   );
 }

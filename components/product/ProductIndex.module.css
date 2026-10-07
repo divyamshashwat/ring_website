@@ -23,6 +23,18 @@
 .filter[aria-pressed='true'] {
   border-bottom-color: var(--ink);
 }
+@media (pointer: coarse) {
+  .filter {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+.buy {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
 .list {
   display: grid;
   gap: clamp(80px, 11vw, 180px);
@@ -61,14 +73,16 @@
 .row:nth-child(3n) .media {
   grid-column-end: span 6;
 }
-.row:hover .media {
-  background: color-mix(in srgb, var(--sw) 11%, var(--pearl));
-}
-.row:hover .media img {
-  transform: scale(1.035) rotate(-1.2deg);
-}
-.row:hover .text {
-  transform: translateX(6px);
+@media (hover: hover) and (pointer: fine) {
+  .row:hover .media {
+    background: color-mix(in srgb, var(--sw) 11%, var(--pearl));
+  }
+  .row:hover .media img {
+    transform: scale(1.035) rotate(-1.2deg);
+  }
+  .row:hover .text {
+    transform: translateX(6px);
+  }
 }
 .name {
   font-family: var(--font-serif);
@@ -90,5 +104,35 @@
   }
   .text {
     margin-top: 28px;
+  }
+}
+/* phones: two pieces per row, the essentials only */
+@media (max-width: 600px) {
+  .filters {
+    gap: 0 20px;
+    padding-bottom: 12px;
+    margin-bottom: 32px;
+  }
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 44px 14px;
+    padding-bottom: 96px;
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .text {
+    margin-top: 14px;
+    gap: 6px;
+  }
+  .name {
+    font-size: 1.6rem;
+  }
+  .specs > :not(:first-child),
+  .desc,
+  .buy :global(.link) {
+    display: none;
   }
 }

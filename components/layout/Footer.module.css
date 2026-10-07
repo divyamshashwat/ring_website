@@ -41,9 +41,11 @@
   color: var(--ink-soft);
   transition: color 0.4s, transform 0.6s var(--ease);
 }
-.col li a:hover {
-  color: var(--ink);
-  transform: translateX(4px);
+@media (hover: hover) and (pointer: fine) {
+  .col li a:hover {
+    color: var(--ink);
+    transform: translateX(4px);
+  }
 }
 .legal {
   margin-top: 72px;
@@ -85,7 +87,33 @@
   }
 }
 @media (max-width: 560px) {
+  .footer {
+    padding-top: 64px;
+  }
+  .aside {
+    margin-top: 28px;
+  }
+  .cols {
+    margin-top: 48px;
+    padding-top: 28px;
+    row-gap: 28px;
+  }
   .col {
-    grid-column: 1 / -1;
+    grid-column: span 6;
+  }
+  .col h2 {
+    margin-bottom: 6px;
+  }
+  .col li a {
+    padding: 10px 0;
+    font-size: 0.92rem;
+  }
+  .legal {
+    margin-top: 40px;
+    padding-block: 20px;
+  }
+  .legal nav a {
+    display: inline-block;
+    padding: 12px 0;
   }
 }

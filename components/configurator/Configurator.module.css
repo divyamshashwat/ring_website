@@ -71,7 +71,7 @@
 }
 .stoneBtn small {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--muted);
   letter-spacing: 0.02em;
 }
@@ -149,7 +149,7 @@
   line-height: 1.2;
 }
 .sizes .opt small {
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 .carats {
@@ -182,51 +182,38 @@
   display: none;
 }
 
-/* ---- mobile: full-bleed product, bottom-sheet controls ---- */
+/* ---- mobile: the piece stays pinned in view while the options scroll beneath it ---- */
 @media (max-width: 900px) {
   .root {
     display: block;
     min-height: auto;
+    --stage-h: clamp(260px, 46svh, 420px);
   }
   .stage {
     position: sticky;
-    top: 0;
-    height: 62svh;
-    z-index: 0;
+    top: var(--header-h);
+    height: var(--stage-h);
+    padding-top: 0;
+    z-index: 3;
+    background: var(--porcelain);
+    border-bottom: 1px solid var(--hairline);
   }
   .stageInner {
     margin: 0;
   }
+  /* the name and price live in the bar at the bottom */
   .stageMeta {
-    padding: 12px var(--margin) 0;
-    gap: 2px;
-  }
-  .stageMeta > :last-child {
     display: none;
-  }
-  .stageName {
-    font-size: 1.6rem;
   }
   .panel {
     position: relative;
     z-index: 1;
     border-left: 0;
-    border-top: 1px solid var(--hairline);
     padding: 0 var(--margin) 32px;
-    min-height: 70svh;
-  }
-  .panel::before {
-    content: '';
-    display: block;
-    width: 36px;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--warm-grey);
-    margin: 10px auto 0;
   }
   .tabs {
     position: sticky;
-    top: var(--header-h);
+    top: calc(var(--header-h) + var(--stage-h));
     z-index: 2;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -236,7 +223,7 @@
     padding: 0 var(--margin);
   }
   .tabs button {
-    height: 52px;
+    height: 48px;
     font-size: var(--fs-micro);
     letter-spacing: 0.2em;
     text-transform: uppercase;
@@ -250,5 +237,19 @@
   }
   .group[data-tab]:not([data-open='true']) {
     display: none;
+  }
+  .group {
+    padding: 18px 0;
+  }
+  .stoneBtn {
+    min-height: 48px;
+    padding: 6px 0;
+  }
+  .row .opt {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .summary {
+    padding-bottom: 8px;
   }
 }

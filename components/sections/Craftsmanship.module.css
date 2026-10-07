@@ -83,6 +83,29 @@
   margin-top: 14px;
 }
 @media (max-width: 900px) {
+  /* five stops in less thumb travel */
+  .section {
+    height: 330vh;
+  }
+  .strip {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-block: 24px 80px;
+  }
+  .strip::-webkit-scrollbar {
+    display: none;
+  }
+  .track {
+    width: max-content;
+    will-change: auto;
+  }
+  .frame {
+    width: 72vw;
+    scroll-snap-align: start;
+    scroll-margin-left: var(--margin);
+    margin-top: 0 !important;
+  }
   .canvas {
     left: 0;
     bottom: auto;

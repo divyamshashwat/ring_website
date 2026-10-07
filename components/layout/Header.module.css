@@ -21,6 +21,8 @@
   justify-self: start;
   color: var(--ink);
   display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   padding: 8px 0;
 }
 .nav {
@@ -120,6 +122,16 @@
 .menuButton {
   align-items: center;
   gap: 10px;
+}
+/* touch: header controls reach a 44px target */
+@media (pointer: coarse) {
+  .util {
+    padding: 16px 0;
+  }
+  .menuButton {
+    min-height: 44px;
+    padding: 0 8px 0 0;
+  }
 }
 .menuLines {
   display: inline-grid;

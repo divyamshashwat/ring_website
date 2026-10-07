@@ -27,7 +27,7 @@ export default async function GemstonesPage() {
         <h2 id="register-title" className="h2" style={{ marginBottom: 40 }}>
           The register
         </h2>
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ position: 'relative', overflowX: 'auto' }}>
           <table className="register">
             <thead>
               <tr>
@@ -48,9 +48,11 @@ export default async function GemstonesPage() {
                     <span className="h3">{g.name}</span>
                     <span className="muted small"> {g.englishName}</span>
                   </th>
-                  <td>{g.gemmology.species}</td>
-                  <td style={{ whiteSpace: 'nowrap' }}>{g.gemmology.hardness}</td>
-                  <td>
+                  <td data-label="Species">{g.gemmology.species}</td>
+                  <td data-label="Hardness" style={{ whiteSpace: 'nowrap' }}>
+                    {g.gemmology.hardness}
+                  </td>
+                  <td data-label="Tradition">
                     {g.group === 'navratna' ? 'Navratna' : 'Uparatna'} · {g.planet.name}
                   </td>
                   <td>
@@ -69,6 +71,17 @@ export default async function GemstonesPage() {
           .register thead th { font-size: var(--fs-micro); letter-spacing: .2em; text-transform: uppercase; font-weight: 500; color: var(--muted); border-bottom-color: var(--hairline-strong); }
           .register tbody th { white-space: nowrap; }
           .register .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 14px; vertical-align: 3px; }
+          @media (max-width: 700px) {
+            .register { min-width: 0; }
+            .register thead { display: none; }
+            .register tbody, .register tr { display: block; }
+            .register tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; padding: 20px 0; border-bottom: 1px solid var(--hairline); }
+            .register th, .register td { display: block; padding: 0; border: 0; }
+            .register tbody th { grid-column: 1; white-space: normal; }
+            .register td[data-label] { grid-column: 1 / -1; color: var(--ink-soft); }
+            .register td[data-label]::before { content: attr(data-label); display: inline-block; min-width: 6.5em; color: var(--muted); }
+            .register td:last-child { grid-column: 2; grid-row: 1; align-self: center; }
+          }
         `}</style>
       </section>
       <JsonLd data={breadcrumbJsonLd([{ name: 'Home', path: '/' }, { name: 'Gemstones', path: '/gemstones' }])} />

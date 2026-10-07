@@ -11,12 +11,20 @@ import { PRIMARY_NAV, WHATSAPP_URL } from './navigation';
 import Wordmark from './Wordmark';
 import styles from './MobileMenu.module.css';
 
-const LINKS = [...PRIMARY_NAV, { href: '/find-your-stone', label: 'Find Your Stone' }, { href: '/journal', label: 'Journal' }];
+const LINKS = [
+  PRIMARY_NAV[0],
+  PRIMARY_NAV[1],
+  { href: '/find-your-stone', label: 'Find Your Stone' },
+  { href: '/configure', label: 'Create Your Ring' },
+  ...PRIMARY_NAV.slice(2),
+  { href: '/journal', label: 'Journal' },
+];
 
 /** The menu falls like an editorial curtain; each line rises through its own mask. */
 export default function MobileMenu() {
   const open = useUI((s) => s.menuOpen);
   const setMenu = useUI((s) => s.setMenu);
+  const setSearch = useUI((s) => s.setSearch);
   const lenis = useLenis();
   const pathname = usePathname();
   const root = useRef<HTMLDivElement>(null);
@@ -85,6 +93,20 @@ export default function MobileMenu() {
         <div className={`container ${styles.foot}`} data-fade>
           <TransitionLink href="/consultation" className="link" tabIndex={open ? 0 : -1}>
             Book a consultation
+          </TransitionLink>
+          <button
+            type="button"
+            className="link link--quiet"
+            tabIndex={open ? 0 : -1}
+            onClick={() => {
+              setMenu(false);
+              setSearch(true);
+            }}
+          >
+            Search
+          </button>
+          <TransitionLink href="/contact" className="link link--quiet" tabIndex={open ? 0 : -1}>
+            Contact
           </TransitionLink>
           <a href={WHATSAPP_URL} className="link link--quiet" target="_blank" rel="noreferrer" tabIndex={open ? 0 : -1}>
             WhatsApp

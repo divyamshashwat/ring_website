@@ -155,12 +155,15 @@ export default function Viewer({
       </div>
       {controls && (
         <div className={styles.controls} data-cursor="default">
-          <span className={`${styles.hint} micro`}>Drag to rotate</span>
+          <span className={`${styles.hint} micro`}>
+            <span className={styles.hintFine}>Drag to rotate</span>
+            <span className={styles.hintTouch}>Swipe sideways to turn</span>
+          </span>
           <div className={styles.buttons}>
-            <button type="button" onClick={() => api.current?.zoom(0.8)} aria-label="Zoom in">
+            <button type="button" data-zoom onClick={() => api.current?.zoom(0.8)} aria-label="Zoom in">
               +
             </button>
-            <button type="button" onClick={() => api.current?.zoom(1.25)} aria-label="Zoom out">
+            <button type="button" data-zoom onClick={() => api.current?.zoom(1.25)} aria-label="Zoom out">
               −
             </button>
             <button type="button" onClick={() => api.current?.reset()} className="micro">

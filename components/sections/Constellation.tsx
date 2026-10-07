@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ConstellationState } from '@/components/3d/ConstellationScene';
 import { navigateWithTransition, TransitionLink } from '@/components/layout/PageTransition';
 import { MaskedLines, Reveal } from '@/components/ui/Reveal';
@@ -18,17 +18,27 @@ export default function Constellation() {
   const [state, setState] = useState<ConstellationState>({ hovered: null, entering: null });
   const setCursor = useUI((s) => s.setCursor);
   const focus = ordered.find((g) => g.slug === state.hovered) ?? null;
+  // touch screens cannot hover: the first tap brings a stone forward, the second enters it
+  const [touch, setTouch] = useState(false);
+  const tapped = useRef<string | null>(null);
+  useEffect(() => setTouch(window.matchMedia('(hover: none)').matches), []);
 
   const hover = useCallback(
     (slug: string | null) => {
+      if (touch && slug === null) return;
       setState((s) => (s.entering ? s : { ...s, hovered: slug }));
       setCursor(slug ? 'explore' : 'default');
     },
-    [setCursor],
+    [setCursor, touch],
   );
 
   const select = useCallback(
     (slug: string) => {
+      if (touch && tapped.current !== slug) {
+        tapped.current = slug;
+        setState((s) => ({ ...s, hovered: slug }));
+        return;
+      }
       const gem = ordered.find((g) => g.slug === slug)!;
       setCursor('default');
       setState({ hovered: slug, entering: slug });
@@ -36,7 +46,7 @@ export default function Constellation() {
       if (prefersReducedMotion()) go();
       else setTimeout(go, 650);
     },
-    [setCursor],
+    [setCursor, touch],
   );
 
   return (
@@ -79,7 +89,9 @@ export default function Constellation() {
               </TransitionLink>
             </>
           ) : (
-            <p className={`${styles.hint} small`}>Move across the stones to bring one forward. Select a stone to enter it.</p>
+            <p className={`${styles.hint} small`}>
+              {touch ? 'Tap a stone to bring it forward. Tap it again to enter.' : 'Move across the stones to bring one forward. Select a stone to enter it.'}
+            </p>
           )}
         </div>
         <ul className={styles.index} aria-label="Gemstones">
@@ -90,10 +102,11 @@ export default function Constellation() {
                 type="button"
                 style={{ ['--sw' as string]: g.swatch }}
                 data-active={state.hovered === g.slug}
-                onMouseEnter={() => setState((s) => ({ ...s, hovered: g.slug }))}
-                onMouseLeave={() => setState((s) => ({ ...s, hovered: null }))}
-                onFocus={() => setState((s) => ({ ...s, hovered: g.slug }))}
-                onBlur={() => setState((s) => ({ ...s, hovered: null }))}
+                aria-pressed={touch ? state.hovered === g.slug : undefined}
+                onMouseEnter={() => !touch && setState((s) => ({ ...s, hovered: g.slug }))}
+                onMouseLeave={() => !touch && setState((s) => ({ ...s, hovered: null }))}
+                onFocus={() => !touch && setState((s) => ({ ...s, hovered: g.slug }))}
+                onBlur={() => !touch && setState((s) => ({ ...s, hovered: null }))}
                 onClick={() => select(g.slug)}
               >
                 {g.name}

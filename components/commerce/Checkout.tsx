@@ -139,7 +139,7 @@ export default function Checkout() {
           {state === 'sending' ? 'Placing order…' : 'Place order'}
         </button>
       </form>
-      <aside className={styles.summary} aria-label="Order summary">
+      <aside className={`${styles.summary} ${styles.summaryFirst}`} aria-label="Order summary">
         <p className="label">Your order</p>
         {items.map((i) => (
           <div key={i.key} className={styles.row} style={{ alignItems: 'baseline' }}>

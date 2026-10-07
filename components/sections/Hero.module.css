@@ -91,6 +91,9 @@
   transform: translateY(-50%);
   width: min(400px, 30vw);
 }
+.stoneMobile {
+  display: none;
+}
 .panel {
   position: absolute;
   right: var(--margin);
@@ -163,6 +166,35 @@
 
 /* Portrait / mobile: the 3D stage takes the upper band, all text lives below it. */
 @media (max-width: 819px) {
+  /* a shorter sequence: the same story in less thumb travel */
+  .hero {
+    height: 330vh;
+  }
+  .stoneMobile {
+    display: grid;
+    gap: 6px;
+    margin-top: 18px;
+    opacity: 0;
+    visibility: hidden;
+  }
+  .stoneMobile :global(.link) {
+    margin-top: 8px;
+    justify-self: start;
+    min-height: 44px;
+  }
+  .ctas {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .ctas :global(.btn) {
+    width: 100%;
+  }
+  .ctas :global(.link) {
+    align-self: center;
+    min-height: 44px;
+  }
   .canvas {
     inset: var(--header-h) 0 auto 0;
     height: calc((100svh - var(--header-h)) * 0.56);
@@ -183,10 +215,23 @@
   .title {
     font-size: clamp(2.5rem, 11vw, 3.4rem);
   }
-  .copy,
+  .stoneTitle :global(.h1) {
+    font-size: clamp(2rem, 8.6vw, 2.6rem);
+  }
   .scroll,
   .panel,
   .rail {
+    display: none;
+  }
+  .copy {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+}
+/* short phones: the headline and actions only */
+@media (max-width: 819px) and (max-height: 760px) {
+  .copy,
+  .stoneMobile p:nth-child(2) {
     display: none;
   }
 }

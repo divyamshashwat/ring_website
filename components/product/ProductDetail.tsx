@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import StickyBuy from '@/components/commerce/StickyBuy';
 import { TransitionLink } from '@/components/layout/PageTransition';
 import { MaskedLines, Reveal } from '@/components/ui/Reveal';
 import { gemstoneBySlug } from '@/lib/data/gemstones';
@@ -26,11 +27,15 @@ export default function ProductDetail({ product, related }: { product: Product; 
   const wishlist = useBag((s) => s.wishlist);
   const toggleWish = useBag((s) => s.toggleWish);
   const wished = wishlist.includes(product.slug);
+  const articleRef = useRef<HTMLElement>(null);
+  const buyRef = useRef<HTMLButtonElement>(null);
+  const sizesRef = useRef<HTMLDivElement>(null);
   const customise = `/configure?${configToSearch({ ...product.configuration, size: size ?? product.configuration.size })}`;
 
   const addToBag = () => {
     if (product.type === 'ring' && size === null) {
       setError('Please select your ring size.');
+      sizesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
     setError('');
@@ -38,7 +43,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
   };
 
   return (
-    <article style={{ ['--sw' as string]: gem.swatch }}>
+    <article ref={articleRef} style={{ ['--sw' as string]: gem.swatch }}>
       <section className={styles.hero}>
         <div className={styles.viewer}>
           <div className={styles.viewerInner}>
@@ -65,8 +70,8 @@ export default function ProductDetail({ product, related }: { product: Product; 
           </div>
 
           {product.type === 'ring' && (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+            <div ref={sizesRef}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                 <span className="label">Select size</span>
                 <TransitionLink href="/care#sizing" className="micro muted">
                   Size guide
@@ -91,7 +96,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
           )}
 
           <div className={styles.actions}>
-            <button type="button" className="btn btn--solid btn--block" onClick={addToBag}>
+            <button ref={buyRef} type="button" className="btn btn--solid btn--block" onClick={addToBag}>
               Add to bag
             </button>
             <TransitionLink href="/consultation" className="btn btn--block">
@@ -254,6 +259,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
           </section>
         )}
       </div>
+      <StickyBuy within={articleRef} target={buyRef} name={product.name} price={formatPrice(product.price)} onAdd={addToBag} />
     </article>
   );
 }
