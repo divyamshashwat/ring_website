@@ -24,6 +24,10 @@ type V3 = [number, number, number];
 /** Stone height above the ring's centre (from the model's layout) and the macro tilt. */
 const STONE_Y = 0.96;
 const MACRO_PITCH = 1.0;
+/** the ring's resting turn in the opening frame (a three-quarter view) */
+const HERO_YAW = -0.62;
+/** length of the pinned sequence in screens of scroll; keep in step with .hero's height (SEQUENCE + 1 screen) */
+const SEQUENCE = 4.1;
 /** world-space extents used to keep the object clear of the text */
 const RING_W = 2.45;
 const RING_H = 2.75;
@@ -110,7 +114,7 @@ export default function Hero() {
     () => ({
       camera: poseToDriver({ position: [0, 0.55, 7.6], target: [0, 0.1, 0], fov: 26, offsetX: 0.2 }),
       pitch: 0.58,
-      yaw: -0.62,
+      yaw: HERO_YAW,
       settle: 0,
       ringY: 0,
       lift: 0,
@@ -130,7 +134,7 @@ export default function Hero() {
       ctx?.revert();
       const P = computePoses(el);
       Object.assign(driver.camera, poseToDriver(P.hero));
-      Object.assign(driver, { pitch: 0.58, yaw: -0.62, settle: 0, ringY: 0, lift: 0, interactive: 0, stoneScale: P.stoneScale });
+      Object.assign(driver, { pitch: 0.58, yaw: HERO_YAW, settle: 0, ringY: 0, lift: 0, interactive: 0, stoneScale: P.stoneScale });
       ctx = gsap.context(() => {
         const tl = gsap.timeline({
           defaults: { ease: 'power2.inOut' },
@@ -138,31 +142,37 @@ export default function Hero() {
             trigger: el,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: reduced ? true : 0.6,
+            scrub: reduced ? true : 1,
             onUpdate: (self) => {
               gsap.set(q(`.${styles.railFill}`), { scaleY: self.progress });
             },
           },
         });
         const cam = driver.camera;
+        // the sequence is laid out in screens of scroll (1 = one viewport height), then normalised
+        const at = (screens: number) => screens / SEQUENCE;
+        const lift = { start: 2.1, length: 1.7 };
         // 1 — the intro dissolves
-        tl.to(q('[data-intro]'), { autoAlpha: 0, y: -40, duration: 0.1, stagger: 0.012, ease: 'power2.in' }, 0.07)
-          .to(q(`.${styles.scroll}`), { opacity: 0, duration: 0.05 }, 0.05)
-          // 2 — the ring comes to centre, the camera draws closer, the ring turns
-          .to(cam, { ...poseToDriver(P.centre), duration: 0.32, ease: 'expo.inOut' }, 0.1)
-          .to(driver, { pitch: 0.7, yaw: Math.PI * 2 - 0.4, settle: 1, duration: 0.34, ease: 'power3.inOut' }, 0.1)
+        tl.to(q('[data-intro]'), { autoAlpha: 0, y: -40, duration: at(0.35), stagger: at(0.04), ease: 'power2.in' }, at(0.22))
+          .to(q(`.${styles.scroll}`), { opacity: 0, duration: at(0.15) }, at(0.15))
+          // 2 — the ring comes to centre and the camera draws closer…
+          .to(cam, { ...poseToDriver(P.centre), duration: at(1.1), ease: 'power2.inOut' }, at(0.35))
+          .to(driver, { pitch: 0.7, settle: 1, duration: at(1.1), ease: 'sine.inOut' }, at(0.35))
+          // …while it makes exactly one slow, even turn, ending where it began
+          .to(driver, { yaw: HERO_YAW + Math.PI * 2, duration: at(1.7), ease: 'sine.inOut' }, at(0.35))
           // 3 — macro: the camera pushes into the setting
-          .to(cam, { ...poseToDriver(P.macro), duration: 0.18, ease: 'expo.inOut' }, 0.44)
-          .to(driver, { pitch: MACRO_PITCH, yaw: Math.PI * 2, duration: 0.18, ease: 'power3.inOut' }, 0.44)
-          // 4 — the stone lifts free of its bezel; the ring falls away
-          .to(driver, { lift: 1, duration: 0.22, ease: 'power2.inOut' }, 0.62)
-          .to(driver, { ringY: -7, duration: 0.09, ease: 'power2.in' }, 0.655)
-          .to(cam, { ...poseToDriver(P.stone), duration: 0.2, ease: 'expo.inOut' }, 0.62)
-          .fromTo(q('[data-stone-line]'), { yPercent: 112 }, { yPercent: 0, duration: 0.08, stagger: 0.015, ease: 'expo.out' }, 0.74)
-          .fromTo(q(`.${styles.panel}`), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.08, ease: 'power3.out' }, 0.79)
-          .fromTo(q('[data-stone-meta]'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.08, ease: 'power3.out' }, 0.79)
-          .set(driver, { interactive: 1 }, 0.8)
-          .to({}, { duration: 0.1 }, 0.9);
+          .to(cam, { ...poseToDriver(P.macro), duration: at(0.65), ease: 'power2.inOut' }, at(1.45))
+          .to(driver, { pitch: MACRO_PITCH, duration: at(0.65), ease: 'sine.inOut' }, at(1.45))
+          // 4 — the stone rises slowly out of its bezel; once it is clear, the ring falls away
+          .to(driver, { lift: 1, duration: at(lift.length), ease: 'sine.inOut' }, at(lift.start))
+          .to(driver, { ringY: -7, duration: at(lift.length * 0.42), ease: 'power2.in' }, at(lift.start + lift.length * 0.18))
+          .to(cam, { ...poseToDriver(P.stone), duration: at(lift.length * 0.95), ease: 'power2.inOut' }, at(lift.start))
+          .fromTo(q('[data-stone-line]'), { yPercent: 112 }, { yPercent: 0, duration: at(0.35), stagger: at(0.06), ease: 'expo.out' }, at(3.45))
+          .fromTo(q(`.${styles.panel}`), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: at(0.3), ease: 'power3.out' }, at(3.6))
+          .fromTo(q('[data-stone-meta]'), { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: at(0.3), ease: 'power3.out' }, at(3.6))
+          .set(driver, { interactive: 1 }, at(3.7))
+          // a moment to hold on the stone before the page moves on
+          .to({}, { duration: at(0.4) }, at(SEQUENCE - 0.4));
       }, el);
     };
     build();

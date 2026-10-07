@@ -1,6 +1,7 @@
 .hero {
   position: relative;
-  height: 430vh;
+  /* 4.1 screens of sequence + the pinned screen itself (see SEQUENCE in Hero.tsx) */
+  height: 510vh;
   background: var(--ivory);
 }
 .sticky {
@@ -166,10 +167,6 @@
 
 /* Portrait / mobile: the 3D stage takes the upper band, all text lives below it. */
 @media (max-width: 819px) {
-  /* a shorter sequence: the same story in less thumb travel */
-  .hero {
-    height: 330vh;
-  }
   .stoneMobile {
     display: grid;
     gap: 6px;
