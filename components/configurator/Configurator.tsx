@@ -14,7 +14,7 @@ import styles from './Configurator.module.css';
 
 const ConfiguratorScene = dynamic(() => import('./ConfiguratorScene'), { ssr: false });
 
-const METAL_SWATCH: Record<MetalId, string> = {
+export const METAL_SWATCH: Record<MetalId, string> = {
   'yellow-gold': 'linear-gradient(135deg, #f7dc8c, #c99a3b 55%, #8a6420)',
   'rose-gold': 'linear-gradient(135deg, #f6cdb8, #c98b6d 55%, #8d5a44)',
   'white-gold': 'linear-gradient(135deg, #f4f3ef, #c9c7c0 55%, #8d8b85)',

@@ -1,14 +1,15 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import StickyBuy from '@/components/commerce/StickyBuy';
 import { TransitionLink } from '@/components/layout/PageTransition';
 import { MaskedLines, Reveal } from '@/components/ui/Reveal';
 import { gemstoneBySlug } from '@/lib/data/gemstones';
-import { METAL_OPTIONS, RING_SIZES } from '@/lib/data/options';
-import { formatPrice } from '@/lib/data/pricing';
-import type { Product } from '@/lib/data/types';
+import { METAL_OPTIONS, PURITY_OPTIONS, purityAvailable, RING_SIZES, STONE_SIZE_OPTIONS, STYLE_OPTIONS } from '@/lib/data/options';
+import { caratsFor, estimatePrice, formatPrice, metalGrams } from '@/lib/data/pricing';
+import type { Configuration, Product } from '@/lib/data/types';
+import { METAL_SWATCH } from '@/components/configurator/Configurator';
 import { useBag } from '@/lib/store/bag';
 import { configToSearch } from '@/lib/store/configurator';
 import ProductImage from './ProductImage';
@@ -20,7 +21,22 @@ const REPORT = 'Stated on the laboratory report';
 
 export default function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const gem = gemstoneBySlug(product.gemstone)!;
-  const metal = METAL_OPTIONS.find((m) => m.id === product.configuration.metal)!;
+  // the piece can be changed here — metal, purity, style, stone size — and the 3D model follows
+  const [config, setConfig] = useState<Configuration>(product.configuration);
+  const set = <K extends keyof Configuration>(key: K, value: Configuration[K]) =>
+    setConfig((c) => {
+      const next = { ...c, [key]: value };
+      // 22K exists only in yellow gold
+      if (key === 'metal' && !purityAvailable(next.metal, next.purity)) next.purity = '18k';
+      return next;
+    });
+  const metal = METAL_OPTIONS.find((m) => m.id === config.metal)!;
+  const style = STYLE_OPTIONS.find((o) => o.id === config.style)!;
+  const isDefault = config.metal === product.configuration.metal && config.purity === product.configuration.purity && config.style === product.configuration.style && config.stoneSize === product.configuration.stoneSize;
+  const price = useMemo(() => (isDefault ? product.price : estimatePrice(config)), [isDefault, product.price, config]);
+  const carats = caratsFor(gem, config.stoneSize);
+  // the authored model is used for the piece as photographed; any other style or stone size is built to order, procedurally
+  const modelPath = config.style === product.configuration.style && config.stoneSize === product.configuration.stoneSize ? product.modelPath : undefined;
   const [size, setSize] = useState<number | null>(product.type === 'ring' ? null : product.configuration.size);
   const [error, setError] = useState('');
   const add = useBag((s) => s.add);
@@ -30,7 +46,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
   const articleRef = useRef<HTMLElement>(null);
   const buyRef = useRef<HTMLButtonElement>(null);
   const sizesRef = useRef<HTMLDivElement>(null);
-  const customise = `/configure?${configToSearch({ ...product.configuration, size: size ?? product.configuration.size })}`;
+  const customise = `/configure?${configToSearch({ ...config, size: size ?? config.size })}`;
 
   const addToBag = () => {
     if (product.type === 'ring' && size === null) {
@@ -39,7 +55,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
       return;
     }
     setError('');
-    add({ productSlug: product.slug, name: product.name, configuration: { ...product.configuration, size: size ?? product.configuration.size }, price: product.price });
+    add({ productSlug: product.slug, name: product.name, configuration: { ...config, size: size ?? config.size }, price });
   };
 
   return (
@@ -47,7 +63,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
       <section className={styles.hero}>
         <div className={styles.viewer}>
           <div className={styles.viewerInner}>
-            <RingViewer config={product.configuration} modelPath={product.modelPath} label={`${product.name}, interactive 3D model`} />
+            <RingViewer config={config} modelPath={modelPath} label={`${product.name} in ${config.purity.toUpperCase()} ${metal.label.toLowerCase()}, interactive 3D model`} />
           </div>
         </div>
         <div className={styles.info}>
@@ -61,12 +77,68 @@ export default function ProductDetail({ product, related }: { product: Product; 
           <div>
             <h1 className={styles.name}>{product.name}</h1>
             <p className="lead" style={{ marginTop: 14 }}>
-              {gem.englishName} · {product.configuration.purity.toUpperCase()} {metal.label}
+              {gem.englishName} · {config.purity.toUpperCase()} {metal.label}
             </p>
           </div>
           <div className={styles.price}>
-            <strong>{formatPrice(product.price)}</strong>
-            <span className="micro muted">Certification included</span>
+            <strong>{formatPrice(price)}</strong>
+            <span className="micro muted">{isDefault ? 'Certification included' : 'Indicative · certification included'}</span>
+          </div>
+
+          <div className={styles.options}>
+            <div className={styles.group}>
+              <div className={styles.groupHead}>
+                <span className="label">Metal</span>
+                <span className="small">{metal.label}</span>
+              </div>
+              <div className={styles.row} role="radiogroup" aria-label="Metal">
+                {METAL_OPTIONS.map((m) => (
+                  <button key={m.id} type="button" role="radio" aria-checked={config.metal === m.id} className={styles.opt} onClick={() => set('metal', m.id)}>
+                    <span className={styles.metalSw} style={{ background: METAL_SWATCH[m.id] }} aria-hidden="true" />
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.group}>
+              <div className={styles.groupHead}>
+                <span className="label">Purity</span>
+                <span className="small muted">{PURITY_OPTIONS.find((o) => o.id === config.purity)!.note}</span>
+              </div>
+              <div className={styles.row} role="radiogroup" aria-label="Gold purity">
+                {PURITY_OPTIONS.map((o) => (
+                  <button key={o.id} type="button" role="radio" aria-checked={config.purity === o.id} className={styles.opt} disabled={!purityAvailable(config.metal, o.id)} onClick={() => set('purity', o.id)}>
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.group}>
+              <div className={styles.groupHead}>
+                <span className="label">Style</span>
+                <span className="small muted">{style.note}</span>
+              </div>
+              <div className={styles.row} role="radiogroup" aria-label="Style">
+                {STYLE_OPTIONS.map((o) => (
+                  <button key={o.id} type="button" role="radio" aria-checked={config.style === o.id} className={styles.opt} onClick={() => set('style', o.id)}>
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={styles.group}>
+              <div className={styles.groupHead}>
+                <span className="label">Stone size</span>
+                <span className="small">approx. {carats.toFixed(2)} ct</span>
+              </div>
+              <div className={styles.row} role="radiogroup" aria-label="Stone size">
+                {STONE_SIZE_OPTIONS.filter((o) => o.id !== 'custom').map((o) => (
+                  <button key={o.id} type="button" role="radio" aria-checked={config.stoneSize === o.id} className={styles.opt} onClick={() => set('stoneSize', o.id)}>
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {product.type === 'ring' && (
@@ -121,16 +193,18 @@ export default function ProductDetail({ product, related }: { product: Product; 
             </div>
             <div>
               <dt>Weight</dt>
-              <dd>approx. {product.stoneDetails.weightCarats.toFixed(2)} ct</dd>
+              <dd>approx. {carats.toFixed(2)} ct</dd>
             </div>
-            <div>
-              <dt>Dimensions</dt>
-              <dd>{product.stoneDetails.dimensionsMm.join(' × ')} mm</dd>
-            </div>
+            {config.stoneSize === product.configuration.stoneSize && (
+              <div>
+                <dt>Dimensions</dt>
+                <dd>{product.stoneDetails.dimensionsMm.join(' × ')} mm</dd>
+              </div>
+            )}
             <div>
               <dt>Metal</dt>
               <dd>
-                {product.configuration.purity.toUpperCase()} {metal.label.toLowerCase()}, approx. {product.metalWeightGrams} g
+                {config.purity.toUpperCase()} {metal.label.toLowerCase()}, approx. {Math.round(metalGrams(config) * 10) / 10} g · {style.label.toLowerCase()} setting
               </dd>
             </div>
             <div>
@@ -258,7 +332,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
           </section>
         )}
       </div>
-      <StickyBuy within={articleRef} target={buyRef} name={product.name} price={formatPrice(product.price)} onAdd={addToBag} />
+      <StickyBuy within={articleRef} target={buyRef} name={product.name} price={formatPrice(price)} onAdd={addToBag} />
     </article>
   );
 }
