@@ -34,9 +34,9 @@ export interface HeroDriver {
   interactive: number;
 }
 
-/** The piece the hero is built around: a natural diamond, bezel-set, shown with the large stone. */
+/** The piece the hero is built around: a natural diamond, bezel-set, shown with a 1.5 ct stone. */
 export const HERO_PRODUCT = products.find((p) => p.slug === 'heera-ring')!;
-export const HERO_CONFIG = { ...HERO_PRODUCT.configuration, stoneSize: 'large' as const };
+export const HERO_CONFIG = { ...HERO_PRODUCT.configuration, stoneSize: 'custom' as const, customCarats: 1.5 };
 
 const p0 = new Vector3();
 const q0 = new Quaternion();

@@ -22,8 +22,8 @@ const HeroScene = dynamic(() => import('@/components/3d/HeroScene'), { ssr: fals
 const product = products.find((p) => p.slug === 'heera-ring')!;
 const stone = gemstoneBySlug(product.gemstone)!;
 const associations = stone.traditionalAssociations.join(', ').toLowerCase();
-// the hero shows the piece with its large stone
-const heroCarats = caratsFor(stone, 'large');
+// the hero shows the piece with a 1.5 ct stone
+const heroCarats = caratsFor(stone, 'custom', 1.5);
 
 type V3 = [number, number, number];
 interface CameraPoseV {
@@ -40,9 +40,10 @@ const HERO_YAW = -0.62;
 /** length of the pinned sequence in screens of scroll; keep in step with .hero's height (SEQUENCE + 1 screen) */
 const SEQUENCE = 4.1;
 /** world-space extents used to keep the object clear of the text */
-const RING_W = 2.45;
-const RING_H = 2.75;
-const STONE_E = 1.3;
+// measured from the hero piece (Heera Ring, 1.5 ct): ring 1.93 × 2.22, stone 0.74 across
+const RING_W = 2.0;
+const RING_H = 2.3;
+const STONE_E = 0.8;
 const GAP = 48;
 
 const tanHalf = (fov: number) => Math.tan((fov * Math.PI) / 360);
@@ -56,7 +57,7 @@ function atDistance(position: V3, target: V3, d: number): V3 {
 
 /** The ring's bounding sphere once tilted toward the viewer (centre, radius): framing it never clips the ring. */
 const RING_CENTRE: V3 = [0, 0.08, 0.08];
-const RING_R = 1.32;
+const RING_R = 1.16;
 
 /** Distance at which a sphere of radius r fills `fill` of the tighter dimension of the frame. */
 function fitSphere(r: number, fov: number, aspect: number, fill: number) {
@@ -83,7 +84,7 @@ function computePoses(el: HTMLElement) {
   const heroPose: CameraPoseV = { position: [0, 0.55, 7.6], target: [0, 0.1, 0], fov: 26, offsetX: 0, offsetY: 0 };
   // the turn and the close-up frame the whole ring around its own centre
   const centrePose: CameraPoseV = { position: [0, 0.85, 6.4], target: RING_CENTRE, fov: 26, offsetX: 0, offsetY: 0 };
-  centrePose.position = atDistance(centrePose.position, centrePose.target, fitSphere(RING_R, 26, aspect, narrow ? 0.8 : 0.66));
+  centrePose.position = atDistance(centrePose.position, centrePose.target, fitSphere(RING_R, 26, aspect, narrow ? 0.9 : 0.72));
   const macroDir: V3 = [RING_CENTRE[0] + 0.4, RING_CENTRE[1] + 2.1, RING_CENTRE[2] + 3.6];
   const macroPose: CameraPoseV = { position: macroDir, target: RING_CENTRE, fov: 22, offsetX: 0, offsetY: 0 };
   macroPose.position = atDistance(macroPose.position, macroPose.target, fitSphere(RING_R, 22, aspect, 0.94));
@@ -93,11 +94,12 @@ function computePoses(el: HTMLElement) {
   if (narrow) {
     // phones: the subject sits in the middle of the screen, between the headline (top-left)
     // and the actions (bottom-right); it fits the free middle band with room to breathe
-    const band = 0.5;
-    const dRing = Math.max(fitW(RING_W, W * 0.78, 26), fitH(RING_H, band * 0.9, 26));
+    const band = 0.6;
+    const dRing = Math.max(fitW(RING_W, W * 0.88, 26), fitH(RING_H, band * 0.92, 26));
     heroPose.position = atDistance(heroPose.position, heroPose.target, dRing);
-    stoneScale = 0.85;
-    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.6, 24), fitH(STONE_E * stoneScale, band * 0.8, 24));
+    // the diamond is presented larger than life once it is free of the ring
+    stoneScale = 1.7;
+    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.7, 24), fitH(STONE_E * stoneScale, band * 0.8, 24));
     stonePose.position = atDistance(stonePose.position, stonePose.target, dStone);
     return { hero: heroPose, centre: centrePose, macro: macroPose, stone: stonePose, stoneScale };
   }
@@ -116,7 +118,7 @@ function computePoses(el: HTMLElement) {
   const dS = Math.hypot(...stonePose.position.map((v, i) => v - stonePose.target[i]));
   const visW = 2 * dS * tanHalf(24) * aspect;
   const visH = 2 * dS * tanHalf(24);
-  stoneScale = Math.min(0.92, (gap * visW) / (STONE_E * W), (0.72 * visH) / STONE_E);
+  stoneScale = Math.min(1.9, (gap * visW) / (STONE_E * W), (0.72 * visH) / STONE_E);
   stonePose.offsetX = (titleRight + gap / 2) / W - 0.5;
   return { hero: heroPose, centre: centrePose, macro: macroPose, stone: stonePose, stoneScale };
 }
