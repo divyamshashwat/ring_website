@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import BagNotice from '@/components/layout/BagNotice';
 import Cursor from '@/components/layout/Cursor';
+import Diagnostics from '@/components/layout/Diagnostics';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import Loader from '@/components/layout/Loader';
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <TransitionLayer />
           <Loader />
           <Cursor />
+          <Diagnostics />
         </SmoothScroll>
         <JsonLd data={organization} />
       </body>

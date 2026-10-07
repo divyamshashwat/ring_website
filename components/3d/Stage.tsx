@@ -6,6 +6,7 @@ import { Component, Suspense, useEffect, useRef, useState, type CSSProperties, t
 import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
+import { report, setGpu } from '@/lib/diag';
 
 interface StageProps {
   children: ReactNode;
@@ -46,7 +47,8 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
     return { failed: true };
   }
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.warn('[vyoma] 3D scene disabled:', error.message, info.componentStack?.split('\n')[1] ?? '');
+    console.warn('[vyoma] 3D scene error:', error.message);
+    report('scene-error', `${error.message} | ${(error.stack ?? '').split('\n').slice(0, 3).join(' | ')} | ${info.componentStack?.split('\n').filter(Boolean)[0]?.trim() ?? ''}`);
     this.props.onError();
   }
   render() {
@@ -61,9 +63,18 @@ function supportsWebGL2() {
     const c = document.createElement('canvas');
     const gl = c.getContext('webgl2');
     webglSupport = !!gl;
+    let renderer = '';
+    if (gl) {
+      const info = gl.getExtension('WEBGL_debug_renderer_info');
+      renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+    } else {
+      renderer = document.createElement('canvas').getContext('webgl') ? 'WebGL1 only' : 'no WebGL';
+    }
+    setGpu(webglSupport, renderer);
     (gl?.getExtension('WEBGL_lose_context') as { loseContext?: () => void } | null)?.loseContext?.();
-  } catch {
+  } catch (e) {
     webglSupport = false;
+    report('webgl-probe', String((e as Error).message));
   }
   return webglSupport;
 }
@@ -82,10 +93,18 @@ export default function Stage({ children, className, style, camera = { position:
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [dpr, setDpr] = useState(1);
+  // a scene gets two more chances (fresh context) before the still is shown
+  const fail = (why: string) => {
+    report('stage', `${ariaLabel ?? 'scene'}: ${why} (attempt ${attempt + 1})`);
+    if (attempt < 2) setAttempt((a) => a + 1);
+    else setFailed(true);
+  };
 
   useEffect(() => {
     if (!supportsWebGL2()) {
+      report('stage', 'WebGL2 unavailable — showing stills');
       setFailed(true);
       return;
     }
@@ -116,7 +135,7 @@ export default function Stage({ children, className, style, camera = { position:
     <div ref={ref} className={className} style={{ position: 'relative', ...style }} role={ariaLabel ? 'img' : undefined} aria-label={ariaLabel}>
       {failed && fallback}
       {mounted && !failed && (
-        <SceneBoundary onError={() => setFailed(true)}>
+        <SceneBoundary key={attempt} onError={() => fail('render error')}>
           <Canvas
             dpr={dpr}
             frameloop={visible && !paused ? 'always' : 'never'}
@@ -130,10 +149,12 @@ export default function Stage({ children, className, style, camera = { position:
               gl.transmissionResolutionScale = q.transmissionScale;
               const canvas = gl.domElement;
               // a context lost while the canvas is still on the page means the GPU gave up: show the still
-              canvas.addEventListener('webglcontextlost', () => {
+              canvas.addEventListener('webglcontextlost', (e) => {
+                // allow the browser to restore it; if it does not, start a fresh context
+                e.preventDefault();
                 setTimeout(() => {
-                  if (canvas.isConnected && gl.getContext().isContextLost()) setFailed(true);
-                }, 1200);
+                  if (canvas.isConnected && gl.getContext().isContextLost()) fail('context lost');
+                }, 1500);
               });
             }}
             style={{ position: 'absolute', inset: 0 }}
