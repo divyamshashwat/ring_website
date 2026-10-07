@@ -112,7 +112,7 @@ export const GEM_SPECS: Record<string, GemSpec> = {
     envMapIntensity: 1.6,
   },
   heera: {
-    refraction: { color: '#ffffff', ior: 2.42, bounces: 4, aberration: 0.02, gain: 1.15 },
+    refraction: { color: '#ffffff', ior: 2.42, bounces: 4, aberration: 0.02, gain: 2.2 },
     color: '#ffffff',
     roughness: 0,
     transmission: 1,

@@ -165,70 +165,80 @@
   }
 }
 
-/* Portrait / mobile: the 3D stage takes the upper band, all text lives below it. */
+/* Portrait / mobile: the piece sits in the middle of the screen; the headline holds the
+   top-left corner and the actions the bottom-right, so text never crosses the ring. */
 @media (max-width: 819px) {
-  .stoneMobile {
-    display: grid;
-    gap: 6px;
-    margin-top: 18px;
-    opacity: 0;
-    visibility: hidden;
-  }
-  .stoneMobile :global(.link) {
-    margin-top: 8px;
-    justify-self: start;
-    min-height: 44px;
-  }
-  .ctas {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-    margin-top: 4px;
-  }
-  .ctas :global(.btn) {
-    width: 100%;
-  }
-  .ctas :global(.link) {
-    align-self: center;
-    min-height: 44px;
-  }
-  /* the stage fills the screen; the camera lifts the subject above the text while text is showing */
   .canvas {
     inset: var(--header-h) 0 0 0;
   }
   .glow {
-    background: radial-gradient(80% 40% at 50% 32%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
+    background: radial-gradient(70% 38% at 50% 52%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
   }
   .intro,
   .stoneTitle {
     left: var(--margin);
     right: var(--margin);
-    top: calc(var(--header-h) + (100svh - var(--header-h)) * 0.58);
-    bottom: auto;
+    top: calc(var(--header-h) + 20px);
+    bottom: calc(26px + env(safe-area-inset-bottom));
     transform: none;
     width: auto;
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   .title {
-    font-size: clamp(2.5rem, 11vw, 3.4rem);
+    font-size: clamp(2.4rem, 10.5vw, 3.2rem);
   }
   .stoneTitle :global(.h1) {
     font-size: clamp(2rem, 8.6vw, 2.6rem);
+  }
+  /* bottom-right corner */
+  .copy {
+    margin-top: auto;
+    align-self: flex-end;
+    text-align: right;
+    max-width: 17em;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .ctas {
+    margin-top: 6px;
+    align-self: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .ctas :global(.link) {
+    min-height: 44px;
+  }
+  .stoneMobile {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+    gap: 4px;
+    margin-top: auto;
+    align-self: flex-end;
+    max-width: 18em;
+    opacity: 0;
+    visibility: hidden;
+  }
+  .stoneMobile :global(.link) {
+    margin-top: 6px;
+    min-height: 44px;
   }
   .scroll,
   .panel,
   .rail {
     display: none;
   }
-  .copy {
-    font-size: 0.95rem;
-    line-height: 1.55;
-  }
 }
 /* short phones: the headline and actions only */
-@media (max-width: 819px) and (max-height: 760px) {
+@media (max-width: 819px) and (max-height: 700px) {
   .copy,
   .stoneMobile p:nth-child(2) {
     display: none;
+  }
+  .ctas {
+    margin-top: auto;
   }
 }

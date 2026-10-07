@@ -13,10 +13,10 @@
     justify-content: space-between;
     gap: 16px;
     padding: 10px var(--margin) calc(10px + env(safe-area-inset-bottom));
-    background: rgba(251, 250, 247, 0.94);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid var(--hairline);
+    /* deep ink, clearly a layer above the page */
+    background: var(--ink);
+    color: var(--ivory);
+    box-shadow: 0 -12px 40px rgba(26, 24, 21, 0.22);
     transform: translateY(105%);
     transition: transform 0.55s var(--ease);
   }
@@ -27,6 +27,9 @@
     --h: 48px;
     flex: none;
     padding: 0 22px;
+    background: var(--ivory);
+    color: var(--ink);
+    border-color: var(--ivory);
   }
 }
 .meta {
@@ -35,7 +38,7 @@
 }
 .name {
   font-size: 0.8rem;
-  color: var(--muted);
+  color: rgba(248, 247, 243, 0.68);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

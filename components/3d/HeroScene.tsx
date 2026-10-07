@@ -34,7 +34,9 @@ export interface HeroDriver {
   interactive: number;
 }
 
-const HERO_PRODUCT = products.find((p) => p.slug === 'moonga-ring')!;
+/** The piece the hero is built around: a natural diamond, bezel-set, shown with the large stone. */
+export const HERO_PRODUCT = products.find((p) => p.slug === 'heera-ring')!;
+export const HERO_CONFIG = { ...HERO_PRODUCT.configuration, stoneSize: 'large' as const };
 
 const p0 = new Vector3();
 const q0 = new Quaternion();
@@ -137,10 +139,10 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
   return (
     <>
       <group ref={ring} onPointerOver={() => setCursor('view')} onPointerOut={() => setCursor('default')}>
-        <ProductModel ref={model} config={HERO_PRODUCT.configuration} modelPath={HERO_PRODUCT.modelPath} animateChanges={false} />
+        <ProductModel ref={model} config={HERO_CONFIG} animateChanges={false} />
       </group>
       <group ref={loose} visible={false} onPointerOver={() => setCursor(driver.interactive > 0.5 ? 'rotate' : 'default')} onPointerOut={() => setCursor('default')}>
-        {stoneGeometry && <Gem slug="moonga" geometry={stoneGeometry} />}
+        {stoneGeometry && <Gem slug={HERO_PRODUCT.gemstone} geometry={stoneGeometry} />}
       </group>
       {quality !== 'low' && (
         <group ref={shadow}>
@@ -156,8 +158,8 @@ export default function HeroScene({ driver, className }: { driver: HeroDriver; c
   const setSceneMounted = useUI((s) => s.setSceneMounted);
   useEffect(() => setSceneMounted(), [setSceneMounted]);
   return (
-    <Stage className={className} style={{ width: '100%', height: '100%' }} persistent fallback={<ProductStill slug="moonga-ring" />} onFail={setSceneReady} camera={{ position: [0, 0.55, 7.6], fov: 26 }} onReady={setSceneReady} ariaLabel="The Moonga Ring in 22K yellow gold, an interactive 3D model">
-      <MaterialLibraryProvider metal="yellow-gold" purity="22k">
+    <Stage className={className} style={{ width: '100%', height: '100%' }} persistent fallback={<ProductStill slug={HERO_PRODUCT.slug} />} onFail={setSceneReady} camera={{ position: [0, 0.55, 7.6], fov: 26 }} onReady={setSceneReady} ariaLabel={`${HERO_PRODUCT.name}, an interactive 3D model`}>
+      <MaterialLibraryProvider metal={HERO_PRODUCT.configuration.metal} purity={HERO_PRODUCT.configuration.purity}>
         <StudioEnvironment />
         <LightingRig follow={0.22} drift={0.05} />
         <CameraRig driver={driver.camera} parallax={0.08} />

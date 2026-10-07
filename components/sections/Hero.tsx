@@ -10,6 +10,7 @@ import { TransitionLink } from '@/components/layout/PageTransition';
 import { MaskedLines } from '@/components/ui/Reveal';
 import { gemstoneBySlug } from '@/lib/data/gemstones';
 import { products } from '@/lib/data/products';
+import { caratsFor } from '@/lib/data/pricing';
 import { prefersReducedMotion } from '@/lib/motion';
 import { debugEnabled } from '@/lib/diag';
 import styles from './Hero.module.css';
@@ -18,8 +19,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 const HeroScene = dynamic(() => import('@/components/3d/HeroScene'), { ssr: false });
 
-const product = products.find((p) => p.slug === 'moonga-ring')!;
-const stone = gemstoneBySlug('moonga')!;
+const product = products.find((p) => p.slug === 'heera-ring')!;
+const stone = gemstoneBySlug(product.gemstone)!;
+const associations = stone.traditionalAssociations.join(', ').toLowerCase();
+// the hero shows the piece with its large stone
+const heroCarats = caratsFor(stone, 'large');
 
 type V3 = [number, number, number];
 interface CameraPoseV {
@@ -87,16 +91,14 @@ function computePoses(el: HTMLElement) {
   let stoneScale = 0.92;
 
   if (narrow) {
-    // phones: text fills the lower part of the screen, so the ring and the stone sit in the band above it
-    const band = 0.54; // share of the canvas above the text
-    const shift = 0.5 - band / 2; // lens shift that centres the subject in that band
-    const dRing = Math.max(fitW(RING_W, W * 0.8, 26), fitH(RING_H, band * 0.84, 26));
+    // phones: the subject sits in the middle of the screen, between the headline (top-left)
+    // and the actions (bottom-right); it fits the free middle band with room to breathe
+    const band = 0.5;
+    const dRing = Math.max(fitW(RING_W, W * 0.78, 26), fitH(RING_H, band * 0.9, 26));
     heroPose.position = atDistance(heroPose.position, heroPose.target, dRing);
-    heroPose.offsetY = shift;
     stoneScale = 0.85;
-    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.66, 24), fitH(STONE_E * stoneScale, band * 0.72, 24));
+    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.6, 24), fitH(STONE_E * stoneScale, band * 0.8, 24));
     stonePose.position = atDistance(stonePose.position, stonePose.target, dStone);
-    stonePose.offsetY = shift;
     return { hero: heroPose, centre: centrePose, macro: macroPose, stone: stonePose, stoneScale };
   }
 
@@ -269,11 +271,11 @@ export default function Hero() {
             {/* phones: the essentials of the panel, under the title */}
             <div className={styles.stoneMobile} data-stone-meta>
               <p className="small">
-                {stone.englishName} · {stone.name} · approx. {product.stoneDetails.weightCarats.toFixed(2)} ct
+                {stone.englishName} · {stone.name} · approx. {heroCarats.toFixed(2)} ct
               </p>
-              <p className="small muted">Traditionally associated with Mars. Drag the stone to turn it.</p>
+              <p className="small muted">Traditionally associated with {stone.planet.name}. Drag the stone to turn it.</p>
               <TransitionLink href={`/products/${product.slug}`} className="link">
-                View the Moonga Ring
+                View {product.name.replace(/^The /, 'the ')}
               </TransitionLink>
             </div>
           </div>
@@ -300,7 +302,7 @@ export default function Hero() {
               </div>
               <div>
                 <dt>Weight</dt>
-                <dd>approx. {product.stoneDetails.weightCarats.toFixed(2)} ct</dd>
+                <dd>approx. {heroCarats.toFixed(2)} ct</dd>
               </div>
               <div>
                 <dt>Treatment</dt>
@@ -311,7 +313,7 @@ export default function Hero() {
                 <dd>Independent laboratory report</dd>
               </div>
             </dl>
-            <p className={`${styles.note} muted`}>Traditionally associated with Mars — courage, vitality, determination. A traditional association, not a claim of effect.</p>
+            <p className={`${styles.note} muted`}>Traditionally associated with {stone.planet.name} — {associations}. A traditional association, not a claim of effect.</p>
             <p className={`${styles.drag} small muted`}>
               <span aria-hidden="true">← →</span>
               Drag to turn the stone
