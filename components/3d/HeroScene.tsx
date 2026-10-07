@@ -43,6 +43,12 @@ const q1 = new Quaternion();
 const qSpin = new Quaternion();
 const e1 = new Euler();
 const Y = new Vector3(0, 1, 0);
+const up = new Vector3();
+const ctrl = new Vector3();
+const ctrl2 = new Vector3();
+const tmpA = new Vector3();
+/** how far the stone rises out of its bezel before it travels (scene units) */
+const RISE = 1.0;
 
 function HeroRing({ driver }: { driver: HeroDriver }) {
   const quality = useQuality();
@@ -52,6 +58,8 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
   const shadow = useRef<Group>(null);
   const [stoneGeometry, setStoneGeometry] = useState<BufferGeometry | null>(null);
   const smooth = useRef({ x: 0, y: 0 });
+  // the stone's seat, captured when the lift begins, so the falling ring cannot drag it back through the metal
+  const seat = useRef<{ p: Vector3; q: Quaternion; s: number } | null>(null);
   const drag = useDragRotation({ enabled: false, pitchLimit: 0.9 });
   const setCursor = useUI((s) => s.setCursor);
   useEffect(() => () => setCursor('default'), [setCursor]);
@@ -85,19 +93,43 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
     ringStone.visible = !lifted;
     if (l) l.visible = lifted;
     drag.current.enabled = d.interactive > 0.5;
+    if (!lifted) {
+      seat.current = null;
+      driver.camera.lw = 0;
+    }
     if (lifted && l) {
       stepDragRotation(drag.current, dt, t, { autoRotate: true, speed: 0.25, restPitch: 0 });
-      ringStone.updateWorldMatrix(true, false);
-      ringStone.matrixWorld.decompose(p0, q0, s0);
+      if (!seat.current) {
+        ringStone.updateWorldMatrix(true, false);
+        ringStone.matrixWorld.decompose(p0, q0, s0);
+        seat.current = { p: p0.clone(), q: q0.clone(), s: s0.x };
+      }
+      const from = seat.current;
       p1.set(0, 0, 0);
       e1.set(0.82 + drag.current.pitch, 0, 0.12);
       q1.setFromEuler(e1);
       qSpin.setFromAxisAngle(Y, drag.current.yaw);
       q1.multiply(qSpin);
       const e = d.lift;
-      l.position.lerpVectors(p0, p1, e);
-      l.quaternion.slerpQuaternions(q0, q1, e);
-      l.scale.setScalar(MathUtils.lerp(s0.x, d.stoneScale, e));
+      // path (cubic Bézier): straight up out of the bezel along the stone's own axis,
+      // high over the ring as it falls away, then down onto its pedestal from above
+      up.copy(Y).applyQuaternion(from.q).normalize();
+      ctrl.copy(from.p).addScaledVector(up, RISE);
+      ctrl2.copy(p1).addScaledVector(Y, RISE * 1.3);
+      const u = 1 - e;
+      tmpA.set(0, 0, 0)
+        .addScaledVector(from.p, u * u * u)
+        .addScaledVector(ctrl, 3 * u * u * e)
+        .addScaledVector(ctrl2, 3 * u * e * e)
+        .addScaledVector(p1, e * e * e);
+      l.position.copy(tmpA);
+      // the camera keeps the stone framed for the whole journey
+      const w = Math.min(1, e / 0.06, (1 - e) / 0.06);
+      Object.assign(driver.camera, { lx: tmpA.x, ly: tmpA.y, lz: tmpA.z, lw: Math.max(0, w) });
+      // keep the stone's orientation until it has cleared the setting, then turn it toward the viewer
+      const turn = MathUtils.smoothstep(e, 0.3, 1);
+      l.quaternion.slerpQuaternions(from.q, q1, turn);
+      l.scale.setScalar(MathUtils.lerp(from.s, d.stoneScale, MathUtils.smoothstep(e, 0.2, 1)));
     }
   });
 

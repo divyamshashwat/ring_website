@@ -155,8 +155,8 @@ export default function Hero() {
           .to(cam, { ...poseToDriver(P.macro), duration: 0.18, ease: 'expo.inOut' }, 0.44)
           .to(driver, { pitch: MACRO_PITCH, yaw: Math.PI * 2, duration: 0.18, ease: 'power3.inOut' }, 0.44)
           // 4 — the stone lifts free of its bezel; the ring falls away
-          .to(driver, { lift: 1, duration: 0.2, ease: 'power3.inOut' }, 0.62)
-          .to(driver, { ringY: -4.6, duration: 0.18, ease: 'power2.in' }, 0.63)
+          .to(driver, { lift: 1, duration: 0.22, ease: 'power2.inOut' }, 0.62)
+          .to(driver, { ringY: -7, duration: 0.09, ease: 'power2.in' }, 0.655)
           .to(cam, { ...poseToDriver(P.stone), duration: 0.2, ease: 'expo.inOut' }, 0.62)
           .fromTo(q('[data-stone-line]'), { yPercent: 112 }, { yPercent: 0, duration: 0.08, stagger: 0.015, ease: 'expo.out' }, 0.74)
           .fromTo(q(`.${styles.panel}`), { opacity: 0, x: 24 }, { opacity: 1, x: 0, duration: 0.08, ease: 'power3.out' }, 0.79)

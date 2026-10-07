@@ -18,6 +18,11 @@ export interface CameraDriver {
   tz: number;
   fov: number;
   offsetX: number;
+  /** optional look-at override (e.g. follow a moving object), blended in by lw (0–1) */
+  lx?: number;
+  ly?: number;
+  lz?: number;
+  lw?: number;
 }
 
 export const poseToDriver = (pose: CameraPose): CameraDriver => ({
@@ -53,6 +58,7 @@ interface CameraRigProps {
 }
 
 const look = new Vector3();
+const lookOverride = new Vector3();
 const pos = new Vector3();
 
 export default function CameraRig({ state = 'PRODUCT', pose, driver, zoom, parallax = 0.12, duration = 1.6, offsetX }: CameraRigProps) {
@@ -85,6 +91,7 @@ export default function CameraRig({ state = 'PRODUCT', pose, driver, zoom, paral
     const z = (zoom?.value ?? 1) * fit;
 
     look.set(d.tx, d.ty, d.tz);
+    if (d.lw) look.lerp(lookOverride.set(d.lx ?? 0, d.ly ?? 0, d.lz ?? 0), d.lw);
     pos.set(d.px, d.py, d.pz).sub(look).multiplyScalar(z).add(look);
     pos.x += sp.x * parallax;
     pos.y -= sp.y * parallax * 0.6;
