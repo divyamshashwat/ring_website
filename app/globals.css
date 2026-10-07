@@ -512,3 +512,11 @@ cite,
     line-height: 1.3;
   }
 }
+
+/* phones: a form's main action spans the full width, in easy reach of the thumb */
+@media (max-width: 600px) {
+  form .btn,
+  form button[type='submit'] {
+    width: 100%;
+  }
+}
