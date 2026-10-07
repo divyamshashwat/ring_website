@@ -1,9 +1,8 @@
 'use client';
 
-import { ContactShadows } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
-import { Euler, MathUtils, Quaternion, Vector3, type BufferGeometry, type Group, type Mesh } from 'three';
+import { Euler, MathUtils, Quaternion, Vector3, type BufferGeometry, type Group, type Mesh, type MeshBasicMaterial } from 'three';
 import { products } from '@/lib/data/products';
 import { pointer } from '@/lib/pointer';
 import { useUI } from '@/lib/store/ui';
@@ -14,7 +13,7 @@ import LightingRig from './LightingRig';
 import { MaterialLibraryProvider } from './MaterialLibrary';
 import ProductModel, { type ProductModelHandle } from './ProductModel';
 import ProgressReporter from './ProgressReporter';
-import { useQuality } from './QualityContext';
+import SoftShadow from './SoftShadow';
 import Stage from './Stage';
 import { ProductStill } from './Fallbacks';
 import { stepDragRotation, useDragRotation } from './useDragRotation';
@@ -52,11 +51,11 @@ const tmpA = new Vector3();
 const RISE = 1.0;
 
 function HeroRing({ driver }: { driver: HeroDriver }) {
-  const quality = useQuality();
   const ring = useRef<Group>(null);
   const model = useRef<ProductModelHandle>(null);
   const loose = useRef<Group>(null);
   const shadow = useRef<Group>(null);
+  const shadowMesh = useRef<Mesh>(null);
   const [stoneGeometry, setStoneGeometry] = useState<BufferGeometry | null>(null);
   const smooth = useRef({ x: 0, y: 0 });
   // the stone's seat, captured when the lift begins, so the falling ring cannot drag it back through the metal
@@ -86,6 +85,9 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
     g.rotation.set(d.pitch + sp.y * 0.12, d.yaw + sway + sp.x * 0.32, Math.sin(t * 0.17) * 0.03 * free);
     g.position.set(0, d.ringY + bob, 0);
     if (shadow.current) shadow.current.position.y = d.ringY - 1.42;
+    // the shadow belongs to the resting ring: it fades as the camera moves in and is gone before the lift
+    const sm = shadowMesh.current?.material as MeshBasicMaterial | undefined;
+    if (sm) sm.opacity = 0.3 * (1 - d.settle * 0.7) * (1 - MathUtils.smoothstep(d.lift, 0, 0.12));
 
     // the lifted stone: interpolate from its seat in the ring to its own pedestal in space
     const ringStone = m.stone;
@@ -142,11 +144,9 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
       <group ref={loose} visible={false} onPointerOver={() => setCursor(driver.interactive > 0.5 ? 'rotate' : 'default')} onPointerOut={() => setCursor('default')}>
         {stoneGeometry && <Gem slug="moonga" geometry={stoneGeometry} />}
       </group>
-      {quality !== 'low' && (
-        <group ref={shadow}>
-          <ContactShadows opacity={0.3} scale={7} blur={2.8} far={2.4} resolution={quality === 'high' ? 512 : 256} color="#4b3b2b" frames={Infinity} />
-        </group>
-      )}
+      <group ref={shadow}>
+        <SoftShadow ref={shadowMesh} y={0} width={3.2} depth={1.6} opacity={0.3} />
+      </group>
     </>
   );
 }

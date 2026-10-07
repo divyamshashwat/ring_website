@@ -2,7 +2,6 @@
 
 import { TransitionLink } from '@/components/layout/PageTransition';
 import ProductImage from '@/components/product/ProductImage';
-import { gemstoneBySlug } from '@/lib/data/gemstones';
 import { formatPrice } from '@/lib/data/pricing';
 import { products } from '@/lib/data/products';
 import { useBag } from '@/lib/store/bag';
@@ -28,14 +27,13 @@ export default function Wishlist() {
   return (
     <ul className={styles.lines}>
       {saved.map((p) => {
-        const gem = gemstoneBySlug(p.gemstone)!;
         return (
           <li key={p.slug} className={styles.line}>
             <div className={styles.thumb}>
               <ProductImage product={p} sizes="120px" />
             </div>
             <div className={styles.lineInfo}>
-              <TransitionLink href={`/products/${p.slug}`} className="h3" stoneColor={gem.swatch}>
+              <TransitionLink href={`/products/${p.slug}`} className="h3">
                 {p.name}
               </TransitionLink>
               <span className="small muted">{p.subtitle}</span>

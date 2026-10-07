@@ -37,7 +37,7 @@ export default function ProductIndex({ products }: { products: Product[] }) {
           const gem = gemstoneBySlug(p.gemstone)!;
           return (
             <li key={p.slug} className={styles.row} style={{ ['--sw' as string]: gem.swatch }}>
-              <TransitionLink href={`/products/${p.slug}`} className={styles.media} stoneColor={gem.swatch} data-cursor="view" aria-label={`View ${p.name}`}>
+              <TransitionLink href={`/products/${p.slug}`} className={styles.media} data-cursor="view" aria-label={`View ${p.name}`}>
                 <ProductImage product={p} priority={i < 2} sizes="(max-width: 600px) 50vw, (max-width: 900px) 100vw, 58vw" />
               </TransitionLink>
               <div className={styles.text}>
@@ -51,7 +51,7 @@ export default function ProductIndex({ products }: { products: Product[] }) {
                 </div>
                 <p className={`body small ${styles.desc}`}>{p.description}</p>
                 <div className={styles.buy}>
-                  <TransitionLink href={`/products/${p.slug}`} className="link" stoneColor={gem.swatch}>
+                  <TransitionLink href={`/products/${p.slug}`} className="link">
                     Explore
                   </TransitionLink>
                   <span className="small muted">{formatPrice(p.price)}</span>

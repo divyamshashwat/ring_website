@@ -103,7 +103,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
               Book a consultation
             </TransitionLink>
             <div className={styles.secondary}>
-              <TransitionLink href={customise} className="link" stoneColor={gem.swatch}>
+              <TransitionLink href={customise} className="link">
                 Customise this piece
               </TransitionLink>
               <button type="button" className="link link--quiet" aria-pressed={wished} onClick={() => toggleWish(product.slug)}>
@@ -194,7 +194,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
             </p>
             <p className="body">Traditionally associated with {gem.traditionalAssociations.join(', ').toLowerCase()}.</p>
             <p className="body">{gem.traditionNote}</p>
-            <TransitionLink href={`/gemstones/${gem.slug}`} className="link" stoneColor={gem.swatch}>
+            <TransitionLink href={`/gemstones/${gem.slug}`} className="link">
               More about {gem.name}
             </TransitionLink>
           </div>
@@ -242,10 +242,9 @@ export default function ProductDetail({ product, related }: { product: Product; 
             </h2>
             <ul className={styles.related}>
               {related.map((p) => {
-                const g = gemstoneBySlug(p.gemstone)!;
                 return (
                   <li key={p.slug}>
-                    <TransitionLink href={`/products/${p.slug}`} stoneColor={g.swatch} data-cursor="view">
+                    <TransitionLink href={`/products/${p.slug}`} data-cursor="view">
                       <div className={styles.img}>
                         <ProductImage product={p} sizes="(max-width: 1000px) 100vw, 33vw" />
                       </div>

@@ -6,6 +6,8 @@ export interface CameraPose {
   fov: number;
   /** horizontal shift of the subject as a fraction of the viewport width (+ = right) */
   offsetX?: number;
+  /** vertical shift of the subject as a fraction of the viewport height (+ = up), a lens shift: no perspective change */
+  offsetY?: number;
 }
 
 /** Named cinematic camera states. Units are centimetres; the ring is ~2.4 cm tall. */
@@ -22,6 +24,16 @@ export const CAMERA_STATES = {
 export type CameraStateName = keyof typeof CAMERA_STATES;
 
 /** Off-centre framing via film offset: keeps product-photography perspective (no skew). */
+/** Vertical lens shift through the camera's view offset. Returns true if the projection needs an update. */
+export function applyVerticalOffset(camera: PerspectiveCamera, fraction: number) {
+  const current = camera.view?.enabled ? camera.view.offsetY : 0;
+  if (Math.abs(current - fraction) < 1e-4) return false;
+  if (Math.abs(fraction) < 1e-4) camera.clearViewOffset();
+  // a 1×1 "full image" makes the offset a plain fraction of the frame height
+  else camera.setViewOffset(1, 1, 0, fraction, 1, 1);
+  return true;
+}
+
 export function applyScreenOffset(camera: PerspectiveCamera, fraction: number) {
   const tan = Math.tan((camera.fov * Math.PI) / 360);
   const filmWidth = camera.getFilmWidth();

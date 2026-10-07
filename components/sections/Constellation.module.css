@@ -113,6 +113,9 @@
   margin: 0 22px 0 4px;
 }
 @media (max-width: 900px) {
+  .section {
+    padding-top: 88px;
+  }
   .title,
   .intro {
     grid-column: 1 / -1;

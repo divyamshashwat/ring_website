@@ -9,6 +9,9 @@ let cached: QualityTier | null = null;
 export function detectQuality(): QualityTier {
   if (cached) return cached;
   if (typeof window === 'undefined') return 'medium';
+  // QA override: ?tier=high|medium|low
+  const forced = new URLSearchParams(window.location.search).get('tier');
+  if (forced === 'high' || forced === 'medium' || forced === 'low') return (cached = forced);
   const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
   const cores = nav.hardwareConcurrency ?? 4;
   const memory = nav.deviceMemory ?? 4;
@@ -23,8 +26,14 @@ export function detectQuality(): QualityTier {
   return cached;
 }
 
+/**
+ * Every tier renders sharp: up to 2× pixels with multisampling (cheap on the
+ * tile-based GPUs in phones). PerformanceMonitor steps the pixel ratio down
+ * only if a device actually struggles. The light tier saves its GPU time where
+ * it does not show: no partial-transmission pass, fewer bounces in faceted stones.
+ */
 export const QUALITY = {
-  high: { dpr: [1, 2] as [number, number], shadows: true, transmissionScale: 1, segments: 'high' as const },
-  medium: { dpr: [1, 1.5] as [number, number], shadows: true, transmissionScale: 0.75, segments: 'medium' as const },
-  low: { dpr: [0.8, 1.25] as [number, number], shadows: false, transmissionScale: 0.5, segments: 'low' as const },
+  high: { dpr: [1, 2] as [number, number], transmissionScale: 1 },
+  medium: { dpr: [1, 2] as [number, number], transmissionScale: 0.75 },
+  low: { dpr: [1, 2] as [number, number], transmissionScale: 0.5 },
 };

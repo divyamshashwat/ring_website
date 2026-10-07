@@ -42,7 +42,7 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
             <p className="h2" id="explore-title">
               {gem.description}
             </p>
-            <p className="small muted">Drag to rotate. Pinch or scroll over the stone to look closer.</p>
+            <p className="small muted">Turn the stone to see how the light moves through it.</p>
           </div>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
               These associations come from Jyotish, the Vedic astrological tradition. They are cultural beliefs, offered here as context for choosing a stone — not as claims of any effect.
             </p>
             <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', marginTop: 8 }}>
-              <TransitionLink href={configure} className="btn btn--solid" stoneColor={gem.swatch}>
+              <TransitionLink href={configure} className="btn btn--solid">
                 Create a piece with {gem.name}
               </TransitionLink>
               <TransitionLink href="/consultation" className="link" style={{ alignSelf: 'center' }}>
@@ -110,7 +110,7 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
           <ul className={styles.pieces}>
             {pieces.map((p) => (
               <li key={p.slug}>
-                <TransitionLink href={`/products/${p.slug}`} stoneColor={gem.swatch} data-cursor="view">
+                <TransitionLink href={`/products/${p.slug}`} data-cursor="view">
                   <div className={styles.img}>
                     <ProductImage product={p} sizes="(max-width: 900px) 100vw, 33vw" />
                   </div>
@@ -125,11 +125,11 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
 
       <nav className="container" style={{ paddingBottom: 'clamp(80px, 10vw, 140px)' }} aria-label="Other gemstones">
         <div className={styles.pager}>
-          <TransitionLink href={`/gemstones/${prev.slug}`} stoneColor={prev.swatch}>
+          <TransitionLink href={`/gemstones/${prev.slug}`}>
             <span className="micro muted">Previous</span>
             <span className="h3">{prev.name}</span>
           </TransitionLink>
-          <TransitionLink href={`/gemstones/${next.slug}`} stoneColor={next.swatch} style={{ textAlign: 'right' }}>
+          <TransitionLink href={`/gemstones/${next.slug}`} style={{ textAlign: 'right' }}>
             <span className="micro muted">Next</span>
             <span className="h3">{next.name}</span>
           </TransitionLink>

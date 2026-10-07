@@ -25,6 +25,8 @@ interface StageProps {
   fallback?: ReactNode;
   /** called if the scene ends up showing its fallback */
   onFail?: () => void;
+  /** upper bound on the pixel ratio for heavy scenes (default: the tier's) */
+  maxDpr?: number;
 }
 
 function ReadySignal({ onReady, name }: { onReady?: () => void; name: string }) {
@@ -102,7 +104,7 @@ const hasWebGL2 = () => typeof window !== 'undefined' && 'WebGL2RenderingContext
  *    (no antialias, 1× pixels) up to twice before the still is shown; the rest of
  *    the page keeps working either way
  */
-export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null, onFail }: StageProps) {
+export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null, onFail, maxDpr }: StageProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [tier, setTier] = useState<QualityTier>('high');
   const [mounted, setMounted] = useState(false);
@@ -135,7 +137,7 @@ export default function Stage({ children, className, style, camera = { position:
     }
     const t = detectQuality();
     setTier(t);
-    setDpr(Math.min(window.devicePixelRatio, QUALITY[t].dpr[1]));
+    setDpr(Math.min(window.devicePixelRatio, maxDpr ?? QUALITY[t].dpr[1]));
     const el = ref.current;
     if (!el) return;
     const keep = persistent ?? t === 'high';
@@ -153,6 +155,7 @@ export default function Stage({ children, className, style, camera = { position:
       near.disconnect();
       view.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [persistent]);
 
   useEffect(() => {
@@ -160,8 +163,8 @@ export default function Stage({ children, className, style, camera = { position:
   }, [failed, onFail]);
 
   const q = QUALITY[tier];
-  // later attempts trade antialiasing for stability
-  const antialias = tier !== 'low' && attempt === 0;
+  // multisampling everywhere (cheap on phone GPUs); a restarted scene trades it for stability
+  const antialias = attempt === 0;
   return (
     <div ref={ref} className={className} style={{ position: 'relative', ...style }} role={ariaLabel ? 'img' : undefined} aria-label={ariaLabel}>
       {failed && fallback}
@@ -190,7 +193,7 @@ export default function Stage({ children, className, style, camera = { position:
             <ContextWatch name={name} onLost={fail} />
             <PerformanceMonitor
               onDecline={() => setDpr((d) => Math.max(q.dpr[0], Math.round((d - 0.25) * 100) / 100))}
-              onIncline={() => setDpr((d) => Math.min(q.dpr[1], window.devicePixelRatio, Math.round((d + 0.25) * 100) / 100))}
+              onIncline={() => setDpr((d) => Math.min(maxDpr ?? q.dpr[1], window.devicePixelRatio, Math.round((d + 0.25) * 100) / 100))}
             />
             <QualityContext.Provider value={tier}>
               <Suspense fallback={null}>

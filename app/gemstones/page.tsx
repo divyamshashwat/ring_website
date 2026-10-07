@@ -56,7 +56,7 @@ export default async function GemstonesPage() {
                     {g.group === 'navratna' ? 'Navratna' : 'Uparatna'} · {g.planet.name}
                   </td>
                   <td>
-                    <TransitionLink href={`/gemstones/${g.slug}`} className="link" stoneColor={g.swatch}>
+                    <TransitionLink href={`/gemstones/${g.slug}`} className="link">
                       Explore
                     </TransitionLink>
                   </td>

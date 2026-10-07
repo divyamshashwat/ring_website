@@ -96,8 +96,19 @@
   gap: 6px;
 }
 @media (max-width: 900px) {
+  .assoc {
+    margin-top: 28px;
+    gap: 6px 22px;
+  }
+  .assoc :global(.label) {
+    flex-basis: 100%;
+  }
+  .assoc strong {
+    font-size: 1.3rem;
+  }
   .explore {
     grid-template-columns: 1fr;
+    padding-block: 32px 64px;
   }
   .viewer {
     height: 60vh;

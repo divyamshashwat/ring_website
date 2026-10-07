@@ -84,7 +84,7 @@ export default function Search() {
                 <ul>
                   {results.stones.map((g) => (
                     <li key={g.slug}>
-                      <TransitionLink href={`/gemstones/${g.slug}`} onClick={close} stoneColor={g.swatch}>
+                      <TransitionLink href={`/gemstones/${g.slug}`} onClick={close}>
                         <span>{g.name}</span>
                         <span className="muted small">{g.englishName}</span>
                       </TransitionLink>

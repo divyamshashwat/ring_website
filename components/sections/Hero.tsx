@@ -11,6 +11,7 @@ import { MaskedLines } from '@/components/ui/Reveal';
 import { gemstoneBySlug } from '@/lib/data/gemstones';
 import { products } from '@/lib/data/products';
 import { prefersReducedMotion } from '@/lib/motion';
+import { debugEnabled } from '@/lib/diag';
 import styles from './Hero.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -21,8 +22,14 @@ const product = products.find((p) => p.slug === 'moonga-ring')!;
 const stone = gemstoneBySlug('moonga')!;
 
 type V3 = [number, number, number];
-/** Stone height above the ring's centre (from the model's layout) and the macro tilt. */
-const STONE_Y = 0.96;
+interface CameraPoseV {
+  position: V3;
+  target: V3;
+  fov: number;
+  offsetX: number;
+  offsetY: number;
+}
+/** The close-up's tilt of the ring toward the viewer. */
 const MACRO_PITCH = 1.0;
 /** the ring's resting turn in the opening frame (a three-quarter view) */
 const HERO_YAW = -0.62;
@@ -34,7 +41,6 @@ const RING_H = 2.75;
 const STONE_E = 1.3;
 const GAP = 48;
 
-const stoneAt = (pitch: number): V3 => [0, STONE_Y * Math.cos(pitch), STONE_Y * Math.sin(pitch)];
 const tanHalf = (fov: number) => Math.tan((fov * Math.PI) / 360);
 
 /** Moves the camera along its own line of sight to distance d from the target. */
@@ -44,10 +50,20 @@ function atDistance(position: V3, target: V3, d: number): V3 {
   return [target[0] + (v[0] / l) * d, target[1] + (v[1] / l) * d, target[2] + (v[2] / l) * d];
 }
 
+/** The ring's bounding sphere once tilted toward the viewer (centre, radius): framing it never clips the ring. */
+const RING_CENTRE: V3 = [0, 0.08, 0.08];
+const RING_R = 1.32;
+
+/** Distance at which a sphere of radius r fills `fill` of the tighter dimension of the frame. */
+function fitSphere(r: number, fov: number, aspect: number, fill: number) {
+  const t = Math.min(tanHalf(fov), tanHalf(fov) * aspect) * fill;
+  return r / Math.sin(Math.atan(t));
+}
+
 /**
- * Camera poses computed from the real layout: the ring sits in the free space
- * to the right of the headline, and the lifted stone between the title and the
- * panel — never under any text, at any viewport size.
+ * Camera poses computed from the real layout. While text is on screen the ring
+ * sits in the free space beside (desktop) or above (phones) it; during the turn,
+ * the close-up and the lift it is centred, and always whole — never cropped.
  */
 function computePoses(el: HTMLElement) {
   const W = window.innerWidth;
@@ -60,35 +76,36 @@ function computePoses(el: HTMLElement) {
   const fitW = (worldW: number, px: number, fov: number) => (worldW * W) / (px * 2 * tanHalf(fov) * aspect);
   const fitH = (worldH: number, fraction: number, fov: number) => worldH / (fraction * 2 * tanHalf(fov));
 
-  const heroPose = { position: [0, 0.55, 7.6] as V3, target: [0, 0.1, 0] as V3, fov: 26, offsetX: 0 };
-  const centrePose = { position: [0, 0.85, 6.4] as V3, target: [0, 0.1, 0] as V3, fov: 26, offsetX: 0 };
-  const s = stoneAt(MACRO_PITCH);
-  const macroPose = { position: [s[0] + 0.4, s[1] + 2.1, s[2] + 3.6] as V3, target: s, fov: 20, offsetX: 0 };
-  const stonePose = { position: [0, 0.35, 4.9] as V3, target: [0, 0, 0] as V3, fov: 24, offsetX: 0 };
+  const heroPose: CameraPoseV = { position: [0, 0.55, 7.6], target: [0, 0.1, 0], fov: 26, offsetX: 0, offsetY: 0 };
+  // the turn and the close-up frame the whole ring around its own centre
+  const centrePose: CameraPoseV = { position: [0, 0.85, 6.4], target: RING_CENTRE, fov: 26, offsetX: 0, offsetY: 0 };
+  centrePose.position = atDistance(centrePose.position, centrePose.target, fitSphere(RING_R, 26, aspect, narrow ? 0.8 : 0.66));
+  const macroDir: V3 = [RING_CENTRE[0] + 0.4, RING_CENTRE[1] + 2.1, RING_CENTRE[2] + 3.6];
+  const macroPose: CameraPoseV = { position: macroDir, target: RING_CENTRE, fov: 22, offsetX: 0, offsetY: 0 };
+  macroPose.position = atDistance(macroPose.position, macroPose.target, fitSphere(RING_R, 22, aspect, 0.94));
+  const stonePose: CameraPoseV = { position: [0, 0.35, 4.9], target: [0, 0, 0], fov: 24, offsetX: 0, offsetY: 0 };
   let stoneScale = 0.92;
 
   if (narrow) {
-    // fit each object inside the upper band with breathing room
-    const dRing = Math.max(fitW(RING_W, W * 0.8, 26), fitH(RING_H, 0.82, 26));
+    // phones: text fills the lower part of the screen, so the ring and the stone sit in the band above it
+    const band = 0.54; // share of the canvas above the text
+    const shift = 0.5 - band / 2; // lens shift that centres the subject in that band
+    const dRing = Math.max(fitW(RING_W, W * 0.8, 26), fitH(RING_H, band * 0.84, 26));
     heroPose.position = atDistance(heroPose.position, heroPose.target, dRing);
-    centrePose.position = atDistance(centrePose.position, centrePose.target, dRing);
-    const dMacro = Math.max(fitW(1.6, W * 0.92, 20), fitH(1.4, 0.92, 20));
-    macroPose.position = atDistance(macroPose.position, macroPose.target, dMacro);
+    heroPose.offsetY = shift;
     stoneScale = 0.85;
-    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.7, 24), fitH(STONE_E * stoneScale, 0.75, 24));
+    const dStone = Math.max(fitW(STONE_E * stoneScale, W * 0.66, 24), fitH(STONE_E * stoneScale, band * 0.72, 24));
     stonePose.position = atDistance(stonePose.position, stonePose.target, dStone);
+    stonePose.offsetY = shift;
     return { hero: heroPose, centre: centrePose, macro: macroPose, stone: stonePose, stoneScale };
   }
 
   // hero: the ring occupies the band between the headline and the right margin
   const textRight = el.querySelector<HTMLElement>(`.${styles.intro}`)!.getBoundingClientRect().right + GAP;
   const band = W - margin - textRight;
-  let d = Math.max(heroPose.position[2], fitW(RING_W, band, 26), fitH(RING_H, 0.86, 26));
+  const d = Math.max(heroPose.position[2], fitW(RING_W, band, 26), fitH(RING_H, 0.86, 26));
   heroPose.position = atDistance(heroPose.position, heroPose.target, d);
   heroPose.offsetX = (textRight + band / 2) / W - 0.5;
-  // centre: whole viewport is free, only keep it within the frame
-  d = Math.max(6.4, fitH(RING_H, 0.86, 26));
-  centrePose.position = atDistance(centrePose.position, centrePose.target, d);
 
   // stone: centred between the title and the panel, sized to the gap
   const titleRight = el.querySelector<HTMLElement>(`.${styles.stoneTitle}`)!.getBoundingClientRect().right + GAP;
@@ -112,7 +129,7 @@ export default function Hero() {
   const section = useRef<HTMLElement>(null);
   const driver = useMemo<HeroDriver>(
     () => ({
-      camera: poseToDriver({ position: [0, 0.55, 7.6], target: [0, 0.1, 0], fov: 26, offsetX: 0.2 }),
+      camera: poseToDriver({ position: [0, 0.55, 7.6], target: [0, 0.1, 0], fov: 26, offsetX: 0.2, offsetY: 0 }),
       pitch: 0.58,
       yaw: HERO_YAW,
       settle: 0,
@@ -126,6 +143,8 @@ export default function Hero() {
 
   useEffect(() => {
     const el = section.current!;
+    // ?debug: expose the live driver for QA scripts
+    if (debugEnabled()) (window as unknown as { __hero?: HeroDriver }).__hero = driver;
     const q = (sel: string) => el.querySelectorAll(sel);
     const reduced = prefersReducedMotion();
     let ctx: gsap.Context | null = null;
@@ -222,7 +241,7 @@ export default function Hero() {
               <TransitionLink href="/collections" className="btn btn--solid">
                 Discover the collection
               </TransitionLink>
-              <TransitionLink href="/find-your-stone" className="link" stoneColor={stone.swatch}>
+              <TransitionLink href="/find-your-stone" className="link">
                 Find your stone
               </TransitionLink>
             </div>
@@ -253,7 +272,7 @@ export default function Hero() {
                 {stone.englishName} · {stone.name} · approx. {product.stoneDetails.weightCarats.toFixed(2)} ct
               </p>
               <p className="small muted">Traditionally associated with Mars. Drag the stone to turn it.</p>
-              <TransitionLink href={`/products/${product.slug}`} className="link" stoneColor={stone.swatch}>
+              <TransitionLink href={`/products/${product.slug}`} className="link">
                 View the Moonga Ring
               </TransitionLink>
             </div>

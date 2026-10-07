@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { TransitionLink } from '@/components/layout/PageTransition';
 import PageIntro from '@/components/ui/PageIntro';
-import { gemstoneBySlug } from '@/lib/data/gemstones';
 import { getArticles } from '@/lib/services/catalog';
 import { pageMetadata } from '@/lib/seo';
 
@@ -15,14 +14,13 @@ const fmt = (d: string) => new Date(d).toLocaleDateString('en-IN', { day: 'numer
 
 export default async function JournalPage() {
   const [lead, ...rest] = await getArticles();
-  const leadGem = lead.stone ? gemstoneBySlug(lead.stone) : null;
   return (
     <>
       <PageIntro lines={['Notes on stone,', <em key="e">tradition and craft.</em>]} compact />
       <section className="container" style={{ paddingBottom: 'clamp(100px, 12vw, 180px)' }}>
         <TransitionLink
           href={`/journal/${lead.slug}`}
-          stoneColor={leadGem?.swatch}
+         
           className="journal-lead"
           style={{ display: 'grid', gap: 22, padding: 'clamp(40px, 6vw, 80px) 0', borderTop: '1px solid var(--hairline-strong)', borderBottom: '1px solid var(--hairline-strong)' }}
         >

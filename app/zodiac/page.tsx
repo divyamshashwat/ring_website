@@ -38,7 +38,7 @@ export default function ZodiacPage() {
                 <span className="small">
                   Ruled by {r.lord} · {r.element}
                 </span>
-                <TransitionLink href={`/gemstones/${gem.slug}`} className="stone" stoneColor={gem.swatch}>
+                <TransitionLink href={`/gemstones/${gem.slug}`} className="stone">
                   <span className="dot" style={{ background: gem.swatch }} aria-hidden="true" />
                   {gem.name}
                   <span className="muted"> · {gem.englishName}</span>

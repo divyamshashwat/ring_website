@@ -67,7 +67,7 @@ export default function Collection() {
               <span>Certified</span>
             </div>
             <p className="small">{formatPrice(product.price)}</p>
-            <TransitionLink href={`/products/${product.slug}`} className="link" stoneColor={gem.swatch} data-cursor="explore">
+            <TransitionLink href={`/products/${product.slug}`} className="link" data-cursor="explore">
               Explore
             </TransitionLink>
           </div>

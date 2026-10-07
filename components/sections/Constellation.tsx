@@ -39,10 +39,9 @@ export default function Constellation() {
         setState((s) => ({ ...s, hovered: slug }));
         return;
       }
-      const gem = ordered.find((g) => g.slug === slug)!;
       setCursor('default');
       setState({ hovered: slug, entering: slug });
-      const go = () => navigateWithTransition({ href: `/gemstones/${slug}`, color: gem.swatch });
+      const go = () => navigateWithTransition({ href: `/gemstones/${slug}` });
       if (prefersReducedMotion()) go();
       else setTimeout(go, 650);
     },
@@ -84,7 +83,7 @@ export default function Constellation() {
                   {focus.group === 'navratna' ? 'Navratna' : 'Uparatna'} · traditionally associated with {focus.planet.name} ({focus.planet.vedic}) · {focus.traditionalAssociations.join(', ')}
                 </p>
               </div>
-              <TransitionLink href={`/gemstones/${focus.slug}`} className="link" stoneColor={focus.swatch}>
+              <TransitionLink href={`/gemstones/${focus.slug}`} className="link">
                 Explore {focus.name}
               </TransitionLink>
             </>

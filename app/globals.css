@@ -500,3 +500,15 @@ cite,
     margin-block: -12px;
   }
 }
+
+/* phones: long editorial sentences set in display sizes step down so they read as text, not posters */
+@media (max-width: 600px) {
+  p.h2 {
+    font-size: 1.7rem;
+    line-height: 1.24;
+  }
+  p.h3 {
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+}

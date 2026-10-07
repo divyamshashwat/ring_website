@@ -34,12 +34,23 @@
   font-size: 1.15rem;
 }
 @media (max-width: 900px) {
+  .section {
+    padding-block: 88px;
+  }
   .title,
   .list {
     grid-column: 1 / -1;
     position: static;
   }
   .list {
-    margin-top: 48px;
+    margin-top: 36px;
+  }
+  .row {
+    grid-template-columns: 2.2em 1fr;
+    gap: 6px 12px;
+    padding: 20px 0 22px;
+  }
+  .row h3 {
+    font-size: 1.4rem;
   }
 }

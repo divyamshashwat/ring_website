@@ -54,12 +54,40 @@
   stroke-width: 0.6;
 }
 @media (max-width: 900px) {
+  .section {
+    padding-block: 88px;
+  }
   .title,
   .textCol,
   .images {
     grid-column: 1 / -1;
   }
+  .title {
+    text-align: left;
+    font-size: clamp(2.5rem, 10vw, 3.4rem);
+  }
+  .body {
+    margin-top: 40px;
+    row-gap: 48px;
+  }
   .textCol {
     position: static;
+    gap: 22px;
+  }
+  .jali {
+    max-width: 220px;
+  }
+  /* two smaller frames side by side, the second set lower, rather than two full-screen blocks */
+  .images {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  .figure {
+    margin-top: 48px;
+  }
+  .figure figcaption {
+    flex-direction: column;
+    gap: 2px;
   }
 }

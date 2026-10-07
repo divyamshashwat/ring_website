@@ -25,7 +25,7 @@ export interface JewelleryParts {
 interface StyleSpec {
   bandBottom: [number, number]; // [thickness, width] at the base of the shank
   bandTop: [number, number]; // at the shoulders
-  exponent: number; // superellipse exponent: 1 = ellipse, ~0.3 = squared edges
+  exponent: number; // superellipse exponent: 1 = ellipse (court), ~0.3 = squared edges
   taper: number; // how quickly the shoulders swell
   bezelWall: number;
   bezelLip: number;
@@ -39,7 +39,7 @@ export const RING_STYLES: Record<RingStyle, StyleSpec> = {
   classic: {
     bandBottom: [0.17, 0.24],
     bandTop: [0.24, 0.5],
-    exponent: 0.62,
+    exponent: 0.85,
     taper: 2.4,
     bezelWall: 0.055,
     bezelLip: 0.05,
@@ -51,7 +51,7 @@ export const RING_STYLES: Record<RingStyle, StyleSpec> = {
   minimal: {
     bandBottom: [0.14, 0.17],
     bandTop: [0.15, 0.21],
-    exponent: 0.75,
+    exponent: 0.92,
     taper: 3,
     bezelWall: 0.035,
     bezelLip: 0.035,
@@ -63,7 +63,7 @@ export const RING_STYLES: Record<RingStyle, StyleSpec> = {
   heritage: {
     bandBottom: [0.18, 0.28],
     bandTop: [0.27, 0.58],
-    exponent: 0.55,
+    exponent: 0.72,
     taper: 2,
     bezelWall: 0.07,
     bezelLip: 0.055,
@@ -75,7 +75,7 @@ export const RING_STYLES: Record<RingStyle, StyleSpec> = {
   contemporary: {
     bandBottom: [0.2, 0.3],
     bandTop: [0.2, 0.3],
-    exponent: 0.22,
+    exponent: 0.32,
     taper: 1,
     bezelWall: 0.05,
     bezelLip: 0.06,
@@ -89,7 +89,8 @@ export const RING_STYLES: Record<RingStyle, StyleSpec> = {
 /** US ring size → inner radius (cm). US 7 ≈ 17.3 mm inner diameter. */
 export const innerRadiusForSize = (usSize: number) => (11.63 + 0.8128 * usSize) / 20;
 
-const segmentsFor = (q: Quality) => (q === 'high' ? 1 : q === 'medium' ? 0.75 : 0.5);
+// 'high' is dense enough that no silhouette shows a polygon edge even in the hero's close-up
+const segmentsFor = (q: Quality) => (q === 'high' ? 1.5 : q === 'medium' ? 0.75 : 0.5);
 
 /** The band, swept around the finger axis (Z). The stone sits at +Y. */
 function shankGeometry(spec: StyleSpec, innerR: number, q: Quality, openGap = 0): BufferGeometry {

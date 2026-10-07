@@ -135,13 +135,13 @@ function Constellation({ stones, state, onHover, onSelect, driver }: Props & { d
 }
 
 export default function ConstellationScene(props: Props) {
-  const driver = useMemo<CameraDriver>(() => ({ px: 0, py: 0.4, pz: 11, tx: 0, ty: -0.2, tz: 0, fov: 30, offsetX: 0 }), []);
+  const driver = useMemo<CameraDriver>(() => ({ px: 0, py: 0.4, pz: 11, tx: 0, ty: -0.2, tz: 0, fov: 30, offsetX: 0, offsetY: 0 }), []);
   const narrow = typeof window !== 'undefined' && window.innerWidth < window.innerHeight;
   useEffect(() => {
     if (narrow) Object.assign(driver, { px: 0, py: 0.2, pz: 15, ty: -0.3 });
   }, [narrow, driver]);
   return (
-    <Stage style={{ width: '100%', height: '100%' }} camera={{ position: [0, 0.4, 11], fov: 30 }} ariaLabel="The nine Navratna stones and four uparatna, floating in space">
+    <Stage style={{ width: '100%', height: '100%' }} maxDpr={1.5} camera={{ position: [0, 0.4, 11], fov: 30 }} ariaLabel="The nine Navratna stones and four uparatna, floating in space">
       <MaterialLibraryProvider>
         <StudioEnvironment />
         <LightingRig follow={0.3} drift={0.08} />

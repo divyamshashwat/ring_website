@@ -80,6 +80,9 @@
   gap: 6px;
 }
 @media (max-width: 1000px) {
+  .section {
+    padding-block: 88px;
+  }
   .headTitle,
   .head p,
   .index,

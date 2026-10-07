@@ -43,7 +43,7 @@ export default function StudioScene({
 }) {
   const shadowY = config.type === 'bracelet' ? -2.1 : config.type === 'pendant' ? -0.9 : -1.25;
   return (
-    <Stage className="studio-stage" style={{ width: '100%', height: '100%' }} persistent onReady={onReady}>
+    <Stage className="studio-stage" style={{ width: '100%', height: '100%' }} persistent maxDpr={1} onReady={onReady}>
       <MaterialLibraryProvider metal={config.metal} purity={config.purity}>
         <StudioEnvironment />
         <LightingRig follow={0} drift={0} />

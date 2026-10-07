@@ -192,9 +192,9 @@
     align-self: center;
     min-height: 44px;
   }
+  /* the stage fills the screen; the camera lifts the subject above the text while text is showing */
   .canvas {
-    inset: var(--header-h) 0 auto 0;
-    height: calc((100svh - var(--header-h)) * 0.56);
+    inset: var(--header-h) 0 0 0;
   }
   .glow {
     background: radial-gradient(80% 40% at 50% 32%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);

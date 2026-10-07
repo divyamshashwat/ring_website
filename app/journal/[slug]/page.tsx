@@ -52,7 +52,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               <span className="small muted">
                 Read about {gem.name} — {gem.englishName}
               </span>
-              <TransitionLink href={`/gemstones/${gem.slug}`} className="link" stoneColor={gem.swatch}>
+              <TransitionLink href={`/gemstones/${gem.slug}`} className="link">
                 Explore the stone
               </TransitionLink>
             </aside>

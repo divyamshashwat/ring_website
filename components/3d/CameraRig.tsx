@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
 import gsap from 'gsap';
-import { applyScreenOffset, CAMERA_STATES, type CameraPose, type CameraStateName } from '@/lib/3d/cameraStates';
+import { applyScreenOffset, applyVerticalOffset, CAMERA_STATES, type CameraPose, type CameraStateName } from '@/lib/3d/cameraStates';
 import { pointer } from '@/lib/pointer';
 import { prefersReducedMotion } from '@/lib/motion';
 
@@ -18,6 +18,8 @@ export interface CameraDriver {
   tz: number;
   fov: number;
   offsetX: number;
+  /** vertical lens shift (fraction of the frame height, + = subject up) */
+  offsetY: number;
   /** optional look-at override (e.g. follow a moving object), blended in by lw (0–1) */
   lx?: number;
   ly?: number;
@@ -34,6 +36,7 @@ export const poseToDriver = (pose: CameraPose): CameraDriver => ({
   tz: pose.target[2],
   fov: pose.fov,
   offsetX: pose.offsetX ?? 0,
+  offsetY: pose.offsetY ?? 0,
 });
 
 export interface ZoomRef {
@@ -105,6 +108,7 @@ export default function CameraRig({ state = 'PRODUCT', pose, driver, zoom, paral
     }
     const narrow = size.width < 820;
     if (applyScreenOffset(camera, narrow ? 0 : d.offsetX)) dirty = true;
+    if (applyVerticalOffset(camera, d.offsetY ?? 0)) dirty = true;
     if (dirty) camera.updateProjectionMatrix();
   });
 

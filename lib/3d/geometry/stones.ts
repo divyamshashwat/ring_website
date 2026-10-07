@@ -218,7 +218,7 @@ export function buildStoneGeometry(shape: StoneShape, quality: 'high' | 'medium'
 }
 
 function buildStone(shape: StoneShape, quality: 'high' | 'medium' | 'low'): BufferGeometry {
-  const seg = quality === 'high' ? 96 : quality === 'medium' ? 72 : 48;
+  const seg = quality === 'high' ? 144 : quality === 'medium' ? 72 : 48;
   switch (shape.cut) {
     case 'cabochon':
     case 'high-cabochon':

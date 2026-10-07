@@ -13,7 +13,6 @@ import { stoneShapeFor } from '@/lib/data/pricing';
 import type { Configuration } from '@/lib/data/types';
 import { prefersReducedMotion } from '@/lib/motion';
 import { useMaterials } from './MaterialLibrary';
-import { useQuality } from './QualityContext';
 import Gem from './GemstoneMaterial';
 import { report } from '@/lib/diag';
 
@@ -52,7 +51,8 @@ function geometryKey(c: Configuration) {
 }
 
 function useProceduralParts(config: Configuration): JewelleryParts {
-  const quality = useQuality();
+  // full density on every device: smooth silhouettes cost almost nothing to draw
+  const quality = 'high';
   const key = geometryKey(config);
   const parts = useMemo(() => {
     const gem = gemstoneBySlug(config.stone) ?? gemstoneBySlug('moonga')!;

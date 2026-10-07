@@ -303,7 +303,7 @@ export default function FindYourStone({ headingLevel = 'h2' }: { headingLevel?: 
                     <div>
                       <dt>Also traditional</dt>
                       <dd>
-                        <TransitionLink href={`/gemstones/${result.companion.slug}`} stoneColor={result.companion.swatch}>
+                        <TransitionLink href={`/gemstones/${result.companion.slug}`}>
                           {result.companion.name} · {result.companion.englishName}
                         </TransitionLink>
                       </dd>
@@ -311,7 +311,7 @@ export default function FindYourStone({ headingLevel = 'h2' }: { headingLevel?: 
                   )}
                 </dl>
                 <div className={styles.actions} style={{ marginTop: 8 }}>
-                  <TransitionLink href={configureHref} className="btn btn--solid" stoneColor={result.primary.swatch}>
+                  <TransitionLink href={configureHref} className="btn btn--solid">
                     Explore your {form ?? 'ring'}
                   </TransitionLink>
                   <TransitionLink href="/consultation" className="link">

@@ -7,16 +7,13 @@ import { useEffect, useRef, type AnchorHTMLAttributes, type MouseEvent, type Rea
 import { prefersReducedMotion } from '@/lib/motion';
 
 /**
- * Object-connected page transitions.
- *
- * A link may carry a colour (the stone it leads to). On click, a small stone of
- * that colour grows from the link itself and fills the screen, the page settles
- * into warm white, then the new page is revealed from it.
+ * The house page transition, identical for every link: a soft champagne wash
+ * spreads from the link itself as the page settles into warm white, then the
+ * new page rises gently out of it.
  */
 interface TransitionRequest {
   href: string;
   origin?: DOMRect;
-  color?: string;
 }
 
 let run: ((req: TransitionRequest) => void) | null = null;
@@ -35,7 +32,7 @@ export function TransitionLayer() {
   const busy = useRef(false);
 
   useEffect(() => {
-    run = ({ href, origin, color }) => {
+    run = ({ href, origin }) => {
       const url = new URL(href, window.location.href);
       if (busy.current) return;
       if (prefersReducedMotion() || url.pathname === window.location.pathname) {
@@ -50,7 +47,7 @@ export function TransitionLayer() {
       const cy = origin ? origin.top + origin.height / 2 : window.innerHeight / 2;
       const cover = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy)) / 8;
       gsap.set(el, { autoAlpha: 1, pointerEvents: 'auto' });
-      gsap.set(dot, { left: cx, top: cy, scale: 0, opacity: 1, background: color ? `radial-gradient(circle at 35% 30%, #fff8 0%, ${color} 38%, ${color} 70%, #0003 100%)` : 'var(--champagne)' });
+      gsap.set(dot, { left: cx, top: cy, scale: 0, opacity: 1, background: 'var(--champagne)' });
       const tl = gsap.timeline({ onComplete: () => router.push(href) });
       tl.fromTo(el.querySelector('[data-veil]'), { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power2.inOut' }, 0);
       tl.to(dot, { scale: 1, duration: 0.35, ease: 'power3.out' }, 0);
@@ -89,19 +86,17 @@ export function TransitionLayer() {
 type TransitionLinkProps = LinkProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkProps> & {
     children: ReactNode;
-    /** colour of the object this link leads to (e.g. the stone) */
-    stoneColor?: string;
   };
 
 /** A next/link that leaves the page with the house transition. */
-export function TransitionLink({ href, stoneColor, onClick, children, ...rest }: TransitionLinkProps) {
+export function TransitionLink({ href, onClick, children, ...rest }: TransitionLinkProps) {
   const handle = (e: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(e);
     if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const target = String(href);
     if (target.startsWith('http') || target.startsWith('mailto:') || target.startsWith('tel:') || target.startsWith('#')) return;
     e.preventDefault();
-    navigateWithTransition({ href: target, origin: e.currentTarget.getBoundingClientRect(), color: stoneColor });
+    navigateWithTransition({ href: target, origin: e.currentTarget.getBoundingClientRect() });
   };
   return (
     <Link href={href} onClick={handle} {...rest}>
