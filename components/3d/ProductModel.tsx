@@ -2,7 +2,7 @@
 
 import { useGLTF } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Component, forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Box3, BufferGeometry, Group, Mesh, Vector3 } from 'three';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import type { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -15,6 +15,7 @@ import { prefersReducedMotion } from '@/lib/motion';
 import { useMaterials } from './MaterialLibrary';
 import { useQuality } from './QualityContext';
 import Gem from './GemstoneMaterial';
+import { report } from '@/lib/diag';
 
 export interface ProductLayout {
   /** world-space centre offset applied to the model */
@@ -270,9 +271,29 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
   else (ref as React.MutableRefObject<T | null>).current = value;
 }
 
+/** If the authored model cannot be downloaded or decoded, the same piece is built procedurally. */
+class GlbBoundary extends Component<{ path: string; fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: Error) {
+    report('model', `${this.props.path}: ${error.message} — building it procedurally instead`);
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
 /** Renders any jewellery configuration, from an authored GLB or procedurally. */
 const ProductModel = forwardRef<ProductModelHandle, ProductModelProps>(function ProductModel(props, ref) {
-  return props.modelPath ? <GlbProduct {...props} modelPath={props.modelPath} forwarded={ref} /> : <ProceduralProduct {...props} forwarded={ref} />;
+  const procedural = <ProceduralProduct {...props} forwarded={ref} />;
+  if (!props.modelPath) return procedural;
+  return (
+    <GlbBoundary path={props.modelPath} fallback={procedural}>
+      <GlbProduct {...props} modelPath={props.modelPath} forwarded={ref} />
+    </GlbBoundary>
+  );
 });
 
 export default ProductModel;

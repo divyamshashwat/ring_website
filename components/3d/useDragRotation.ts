@@ -15,6 +15,16 @@ export interface DragState {
   /** 0 = user in control, 1 = idle motion fully blended in */
   idle: number;
   enabled: boolean;
+  /** how far the automatic turn has travelled (radians); it stops after one revolution */
+  autoTravel: number;
+}
+
+const ONE_TURN = Math.PI * 2;
+
+/** Re-arms the single automatic revolution (e.g. from a "Turn" button). */
+export function armTurn(s: DragState) {
+  s.autoTravel = 0;
+  s.lastInteraction = -10;
 }
 
 interface Options {
@@ -34,7 +44,7 @@ interface Options {
  */
 export function useDragRotation({ enabled = true, zoom, wheel = false, pitchLimit = 0.7, sensitivity = 1 }: Options = {}) {
   const gl = useThree((s) => s.gl);
-  const state = useRef<DragState>({ yaw: 0, pitch: 0, vYaw: 0, vPitch: 0, dragging: false, lastInteraction: -10, idle: 1, enabled });
+  const state = useRef<DragState>({ yaw: 0, pitch: 0, vYaw: 0, vPitch: 0, dragging: false, lastInteraction: -10, idle: 1, enabled, autoTravel: 0 });
   state.current.enabled = enabled;
 
   useEffect(() => {
@@ -50,6 +60,8 @@ export function useDragRotation({ enabled = true, zoom, wheel = false, pitchLimi
       pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (pointers.size === 1) {
         s.dragging = true;
+        // the visitor has taken over: the automatic turn is not resumed
+        s.autoTravel = ONE_TURN;
         s.vYaw = s.vPitch = 0;
         last = { x: e.clientX, y: e.clientY, t: performance.now() };
         el.setPointerCapture(e.pointerId);
@@ -116,11 +128,14 @@ export function useDragRotation({ enabled = true, zoom, wheel = false, pitchLimi
 }
 
 /**
- * Integrates momentum, then blends into a slow, breathing idle motion once the
- * user has let go for a moment. Call inside useFrame.
+ * Integrates momentum and lets the pitch settle. With autoRotate, the piece makes
+ * one slow revolution when it first appears, eases to a stop facing the way it
+ * started, and then stays still. Call inside useFrame.
  */
-export function stepDragRotation(s: DragState, dt: number, time: number, opts: { autoRotate: boolean; restPitch?: number; idleDelay?: number; speed?: number }) {
+export function stepDragRotation(s: DragState, frameDt: number, _time: number, opts: { autoRotate: boolean; restPitch?: number; idleDelay?: number; speed?: number }) {
   const { autoRotate, restPitch = 0, idleDelay = 2.2, speed = 0.22 } = opts;
+  // a resumed render loop reports the whole pause as one frame
+  const dt = Math.min(frameDt, 1 / 20);
   const since = performance.now() / 1000 - s.lastInteraction;
   const wantsIdle = !s.dragging && since > idleDelay;
   s.idle = MathUtils.damp(s.idle, wantsIdle ? 1 : 0, wantsIdle ? 0.8 : 6, dt);
@@ -133,9 +148,12 @@ export function stepDragRotation(s: DragState, dt: number, time: number, opts: {
     // pitch springs back softly toward rest
     s.pitch = MathUtils.damp(s.pitch, restPitch, 1.4 * s.idle + 0.3, dt);
   }
-  if (autoRotate) {
-    // never a constant robotic spin: the turn breathes
-    const breathe = 0.65 + 0.35 * Math.sin(time * 0.35);
-    s.yaw += speed * breathe * s.idle * dt;
+  const remaining = ONE_TURN - s.autoTravel;
+  if (autoRotate && remaining > 0) {
+    // full speed for most of the turn, then a long, soft ease into the stop
+    const v = speed * 2 * Math.max(Math.min(1, remaining / 1.1), 0.06);
+    const step = Math.min(remaining, v * s.idle * dt);
+    s.yaw += step;
+    s.autoTravel += step;
   }
 }

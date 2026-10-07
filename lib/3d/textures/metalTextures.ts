@@ -2,48 +2,25 @@ import { CanvasTexture, LinearSRGBColorSpace, NoColorSpace, RepeatWrapping, Text
 import { drawHallmark, drawScratches } from './draw';
 
 /**
- * Procedural metal textures. The scratch map is generated off the main thread
- * in a Web Worker (OffscreenCanvas) when available, so it never competes with
- * first paint or scroll.
+ * Procedural metal textures. The scratch map is drawn once per page, just after
+ * the first frame, so it never delays the first paint of a scene.
  */
-let scratchPromise: Promise<ImageBitmap | HTMLCanvasElement> | null = null;
+let scratchPromise: Promise<HTMLCanvasElement> | null = null;
 
-function generateScratchImage(size: number): Promise<ImageBitmap | HTMLCanvasElement> {
-  if (scratchPromise) return scratchPromise;
-  scratchPromise = new Promise((resolve) => {
-    const fallback = () => {
+function generateScratchImage(size: number): Promise<HTMLCanvasElement> {
+  scratchPromise ??= new Promise((resolve) => {
+    setTimeout(() => {
       const canvas = document.createElement('canvas');
       canvas.width = canvas.height = size;
-      drawScratches(canvas.getContext('2d')!, size, 11);
+      const ctx = canvas.getContext('2d');
+      if (ctx) drawScratches(ctx, size, 11);
       resolve(canvas);
-    };
-    if (typeof Worker === 'undefined' || typeof OffscreenCanvas === 'undefined') return fallback();
-    try {
-      const worker = new Worker(new URL('./texture.worker.ts', import.meta.url), { type: 'module' });
-      const timer = setTimeout(() => {
-        worker.terminate();
-        fallback();
-      }, 4000);
-      worker.onmessage = (e: MessageEvent<{ bitmap?: ImageBitmap }>) => {
-        clearTimeout(timer);
-        worker.terminate();
-        if (e.data.bitmap) resolve(e.data.bitmap);
-        else fallback();
-      };
-      worker.onerror = () => {
-        clearTimeout(timer);
-        worker.terminate();
-        fallback();
-      };
-      worker.postMessage({ kind: 'scratches', size, seed: 11 });
-    } catch {
-      fallback();
-    }
+    }, 60);
   });
   return scratchPromise;
 }
 
-/** Returns a texture immediately; its image arrives from the worker shortly after. */
+/** Returns a texture immediately; its image is drawn shortly after. */
 export function createScratchTexture(size = 1024): Texture {
   const texture = new Texture();
   texture.wrapS = texture.wrapT = RepeatWrapping;

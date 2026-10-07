@@ -2,12 +2,12 @@
 
 import { Canvas, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
-import { Component, Suspense, useEffect, useRef, useState, type CSSProperties, type ErrorInfo, type ReactNode } from 'react';
+import { Component, Suspense, useCallback, useEffect, useRef, useState, type CSSProperties, type ErrorInfo, type ReactNode } from 'react';
 import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
 import { report, setGpu } from '@/lib/diag';
-import { browserWithholdsPrecision, createHardenedRenderer } from '@/lib/3d/webglCompat';
+import { createRenderer } from '@/lib/3d/webglCompat';
 
 interface StageProps {
   children: ReactNode;
@@ -27,24 +27,55 @@ interface StageProps {
   onFail?: () => void;
 }
 
-function ReadySignal({ onReady }: { onReady?: () => void }) {
+function ReadySignal({ onReady, name }: { onReady?: () => void; name: string }) {
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       invalidate();
-      raf2 = requestAnimationFrame(() => onReady?.());
+      raf2 = requestAnimationFrame(() => {
+        report('scene', `${name}: first frame`);
+        onReady?.();
+      });
     });
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [invalidate, onReady]);
+  }, [invalidate, onReady, name]);
+  return null;
+}
+
+/** A context the GPU drops is given time to come back before the scene is restarted. */
+function ContextWatch({ name, onLost }: { name: string; onLost: (why: string) => void }) {
+  const gl = useThree((s) => s.gl);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const lost = () => {
+      report('context', `${name}: lost`);
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (gl.getContext().isContextLost()) onLost('context lost and not restored');
+      }, 3000);
+    };
+    const restored = () => {
+      clearTimeout(timer);
+      report('context', `${name}: restored`);
+    };
+    canvas.addEventListener('webglcontextlost', lost);
+    canvas.addEventListener('webglcontextrestored', restored);
+    return () => {
+      clearTimeout(timer);
+      canvas.removeEventListener('webglcontextlost', lost);
+      canvas.removeEventListener('webglcontextrestored', restored);
+    };
+  }, [gl, name, onLost]);
   return null;
 }
 
 /** Contains any 3D failure to its own canvas instead of taking the page down. */
-class SceneBoundary extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
+class SceneBoundary extends Component<{ children: ReactNode; onError: (why: string, fatal: boolean) => void }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
@@ -52,44 +83,24 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.warn('[vyoma] 3D scene error:', error.message);
     report('scene-error', `${error.message} | ${(error.stack ?? '').split('\n').slice(0, 3).join(' | ')} | ${info.componentStack?.split('\n').filter(Boolean)[0]?.trim() ?? ''}`);
-    this.props.onError();
+    // no context at all will not get better on a second try
+    this.props.onError(error.message, /could not be created/.test(error.message));
   }
   render() {
     return this.state.failed ? null : this.props.children;
   }
 }
 
-let webglSupport: boolean | null = null;
-function supportsWebGL2() {
-  if (webglSupport !== null) return webglSupport;
-  try {
-    const c = document.createElement('canvas');
-    const gl = c.getContext('webgl2');
-    webglSupport = !!gl;
-    let renderer = '';
-    if (gl) {
-      const info = gl.getExtension('WEBGL_debug_renderer_info');
-      renderer = String(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
-    } else {
-      renderer = document.createElement('canvas').getContext('webgl') ? 'WebGL1 only' : 'no WebGL';
-    }
-    setGpu(webglSupport, renderer);
-    if (gl) browserWithholdsPrecision(gl);
-    (gl?.getExtension('WEBGL_lose_context') as { loseContext?: () => void } | null)?.loseContext?.();
-  } catch (e) {
-    webglSupport = false;
-    report('webgl-probe', String((e as Error).message));
-  }
-  return webglSupport;
-}
+const hasWebGL2 = () => typeof window !== 'undefined' && 'WebGL2RenderingContext' in window;
 
 /**
  * A lazily-mounted, visibility-aware, failure-safe WebGL canvas.
  *  - mounts when near the viewport, pauses the render loop when off-screen
  *  - on medium/low tiers (phones), unmounts when away from the viewport to free GPU memory
  *  - adaptive DPR via PerformanceMonitor, tone mapping tuned for product colour
- *  - if WebGL is missing, a scene throws, or the GPU drops the context, the
- *    fallback is shown and the rest of the page keeps working
+ *  - a scene that throws or loses its context is restarted on a lighter context
+ *    (no antialias, 1× pixels) up to twice before the still is shown; the rest of
+ *    the page keeps working either way
  */
 export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null, onFail }: StageProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -99,15 +110,25 @@ export default function Stage({ children, className, style, camera = { position:
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [dpr, setDpr] = useState(1);
-  // a scene gets two more chances (fresh context) before the still is shown
-  const fail = (why: string) => {
-    report('stage', `${ariaLabel ?? 'scene'}: ${why} (attempt ${attempt + 1})`);
-    if (attempt < 2) setAttempt((a) => a + 1);
-    else setFailed(true);
-  };
+  const attemptRef = useRef(0);
+  const name = (ariaLabel ?? 'scene').split(',')[0];
+
+  const fail = useCallback(
+    (why: string, fatal = false) => {
+      const n = attemptRef.current;
+      report('stage', `${name}: ${why} (attempt ${n + 1})`);
+      if (!fatal && n < 2) {
+        attemptRef.current = n + 1;
+        setAttempt(n + 1);
+        setDpr((d) => Math.min(d, 1));
+      } else setFailed(true);
+    },
+    [name],
+  );
 
   useEffect(() => {
-    if (!supportsWebGL2()) {
+    if (!hasWebGL2()) {
+      setGpu(false, 'no WebGL2');
       report('stage', 'WebGL2 unavailable — showing stills');
       setFailed(true);
       return;
@@ -139,19 +160,22 @@ export default function Stage({ children, className, style, camera = { position:
   }, [failed, onFail]);
 
   const q = QUALITY[tier];
+  // later attempts trade antialiasing for stability
+  const antialias = tier !== 'low' && attempt === 0;
   return (
     <div ref={ref} className={className} style={{ position: 'relative', ...style }} role={ariaLabel ? 'img' : undefined} aria-label={ariaLabel}>
       {failed && fallback}
       {mounted && !failed && (
-        <SceneBoundary key={attempt} onError={() => fail('render error')}>
+        <SceneBoundary key={attempt} onError={fail}>
           <Canvas
             dpr={dpr}
             frameloop={visible && !paused ? 'always' : 'never'}
             camera={{ position: camera.position, fov: camera.fov, near: 0.1, far: 100 }}
-            gl={
-              browserWithholdsPrecision()
-                ? (defaults) => createHardenedRenderer(defaults.canvas as HTMLCanvasElement, { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })
-                : { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false }
+            gl={(defaults) =>
+              createRenderer(defaults.canvas as HTMLCanvasElement, {
+                antialias,
+                powerPreference: attempt === 0 ? 'high-performance' : 'default',
+              })
             }
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0);
@@ -159,18 +183,11 @@ export default function Stage({ children, className, style, camera = { position:
               gl.toneMappingExposure = 1.0;
               gl.outputColorSpace = SRGBColorSpace;
               gl.transmissionResolutionScale = q.transmissionScale;
-              const canvas = gl.domElement;
-              // a context lost while the canvas is still on the page means the GPU gave up: show the still
-              canvas.addEventListener('webglcontextlost', (e) => {
-                // allow the browser to restore it; if it does not, start a fresh context
-                e.preventDefault();
-                setTimeout(() => {
-                  if (canvas.isConnected && gl.getContext().isContextLost()) fail('context lost');
-                }, 1500);
-              });
+              report('scene', `${name}: renderer ready (tier ${tier}, dpr ${gl.getPixelRatio()}, aa ${antialias ? 'on' : 'off'})`);
             }}
             style={{ position: 'absolute', inset: 0 }}
           >
+            <ContextWatch name={name} onLost={fail} />
             <PerformanceMonitor
               onDecline={() => setDpr((d) => Math.max(q.dpr[0], Math.round((d - 0.25) * 100) / 100))}
               onIncline={() => setDpr((d) => Math.min(q.dpr[1], window.devicePixelRatio, Math.round((d + 0.25) * 100) / 100))}
@@ -178,7 +195,7 @@ export default function Stage({ children, className, style, camera = { position:
             <QualityContext.Provider value={tier}>
               <Suspense fallback={null}>
                 {children}
-                <ReadySignal onReady={onReady} />
+                <ReadySignal onReady={onReady} name={name} />
               </Suspense>
             </QualityContext.Provider>
           </Canvas>

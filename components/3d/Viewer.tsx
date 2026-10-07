@@ -3,7 +3,7 @@
 import { ContactShadows } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import gsap from 'gsap';
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from 'react';
 import type { Group } from 'three';
 import type { CameraPose } from '@/lib/3d/cameraStates';
 import type { MetalId, Purity } from '@/lib/data/types';
@@ -14,13 +14,15 @@ import LightingRig from './LightingRig';
 import { MaterialLibraryProvider } from './MaterialLibrary';
 import { useQuality } from './QualityContext';
 import Stage from './Stage';
-import { stepDragRotation, useDragRotation } from './useDragRotation';
+import { armTurn, stepDragRotation, useDragRotation } from './useDragRotation';
 import styles from './Viewer.module.css';
 
 export interface ViewerApi {
   reset: () => void;
   zoom: (factor: number) => void;
   setAutoRotate: (on: boolean) => void;
+  /** one more slow revolution */
+  turn: () => void;
   /** a physical nudge: the object turns by `yaw` and settles */
   nudge: (yaw: number) => void;
   /** a brief camera push toward the object */
@@ -37,7 +39,7 @@ interface InteractiveProps {
   wheel: boolean;
 }
 
-/** Wraps any object in physical drag rotation with inertia and an idle "breathing" turn. */
+/** Wraps any object in physical drag rotation with inertia and a single introductory turn. */
 function Interactive({ children, zoom, apiRef, autoRotate, restPitch, restYaw, wheel }: InteractiveProps) {
   const group = useRef<Group>(null);
   const drag = useDragRotation({ zoom, wheel, pitchLimit: 1.1 });
@@ -60,6 +62,10 @@ function Interactive({ children, zoom, apiRef, autoRotate, restPitch, restYaw, w
       },
       setAutoRotate: (on) => {
         autoRotate.current = on;
+      },
+      turn: () => {
+        autoRotate.current = true;
+        armTurn(drag.current);
       },
       nudge: (yaw) => {
         const s = drag.current;
@@ -106,7 +112,7 @@ interface ViewerProps {
 
 /**
  * Product / gemstone viewer: drag to rotate (inertial), pinch or wheel to zoom,
- * reset, auto-rotate toggle. When left alone it settles into a slow idle turn.
+ * reset, and a "Turn" button. On first view the piece turns once, then rests.
  */
 export default function Viewer({
   children,
@@ -131,7 +137,6 @@ export default function Viewer({
   const ownApi = useRef<ViewerApi | null>(null);
   const api = apiRef ?? ownApi;
   const auto = useRef(autoDefault);
-  const [autoOn, setAutoOn] = useState(autoDefault);
   return (
     <div className={`${styles.viewer} ${className ?? ''}`} data-lenis-prevent={wheelZoom ? '' : undefined} data-cursor="rotate">
       <div className={styles.canvasArea}>
@@ -161,17 +166,8 @@ export default function Viewer({
             <button type="button" onClick={() => api.current?.reset()} className="micro">
               Reset
             </button>
-            <button
-              type="button"
-              className="micro"
-              aria-pressed={autoOn}
-              onClick={() => {
-                const next = !autoOn;
-                setAutoOn(next);
-                api.current?.setAutoRotate(next);
-              }}
-            >
-              {autoOn ? 'Pause turn' : 'Auto turn'}
+            <button type="button" className="micro" onClick={() => api.current?.turn()} aria-label="Turn the piece once">
+              Turn
             </button>
           </div>
         </div>

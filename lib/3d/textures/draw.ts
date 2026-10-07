@@ -1,8 +1,5 @@
-/**
- * Canvas drawing routines shared by the texture worker (OffscreenCanvas) and
- * the main-thread fallback.
- */
-type Ctx = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
+/** Canvas drawing routines for the procedural metal textures. */
+type Ctx = CanvasRenderingContext2D;
 
 function rng(seed: number) {
   let s = seed >>> 0;

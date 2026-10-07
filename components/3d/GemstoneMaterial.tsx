@@ -7,6 +7,7 @@ import { AdditiveBlending, Color, MeshPhysicalMaterial, type BufferGeometry, typ
 import { bindGemMesh, GEM_SPECS } from '@/lib/3d/materials/gemstone';
 import { useMaterials } from './MaterialLibrary';
 import { useGemEnvScene } from './Environment';
+import { useQuality } from './QualityContext';
 
 /** Waits for the gem light-tent environment to exist (created by <StudioEnvironment> on mount). */
 function useSceneEnvironment() {
@@ -67,6 +68,8 @@ export default Gem;
 const RefractedGem = forwardRef<Mesh, { slug: string; geometry: BufferGeometry; env: Texture; spec: NonNullable<(typeof GEM_SPECS)[string]['refraction']> }>(
   function RefractedGem({ slug, geometry, env, spec }, ref) {
     const lib = useMaterials();
+    // phones trace fewer internal bounces: most of the look, a fraction of the GPU time
+    const bounces = useQuality() === 'low' ? Math.min(2, spec.bounces) : spec.bounces;
     const mesh = useRef<Mesh>(null);
     const base = useMemo(() => new Color(spec.color).multiplyScalar(spec.gain ?? 1.15), [spec.color, spec.gain]);
     // the surface layer: diffuse black, so only true specular reflection is added on top
@@ -109,7 +112,7 @@ const RefractedGem = forwardRef<Mesh, { slug: string; geometry: BufferGeometry; 
           {/* note: no ref here – drei keeps its own internal material ref */}
           <MeshRefractionMaterial
             envMap={env}
-            bounces={spec.bounces}
+            bounces={bounces}
             ior={spec.ior}
             fresnel={spec.fresnel ?? 0.6}
             aberrationStrength={spec.aberration}
