@@ -7,9 +7,7 @@ import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
 import { report, setGpu } from '@/lib/diag';
-import { createHardenedRenderer, patchWebGLForPrivacyBrowsers } from '@/lib/3d/webglCompat';
-
-patchWebGLForPrivacyBrowsers();
+import { browserWithholdsPrecision, createHardenedRenderer } from '@/lib/3d/webglCompat';
 
 interface StageProps {
   children: ReactNode;
@@ -64,7 +62,6 @@ class SceneBoundary extends Component<{ children: ReactNode; onError: () => void
 let webglSupport: boolean | null = null;
 function supportsWebGL2() {
   if (webglSupport !== null) return webglSupport;
-  patchWebGLForPrivacyBrowsers();
   try {
     const c = document.createElement('canvas');
     const gl = c.getContext('webgl2');
@@ -77,6 +74,7 @@ function supportsWebGL2() {
       renderer = document.createElement('canvas').getContext('webgl') ? 'WebGL1 only' : 'no WebGL';
     }
     setGpu(webglSupport, renderer);
+    if (gl) browserWithholdsPrecision(gl);
     (gl?.getExtension('WEBGL_lose_context') as { loseContext?: () => void } | null)?.loseContext?.();
   } catch (e) {
     webglSupport = false;
@@ -150,7 +148,11 @@ export default function Stage({ children, className, style, camera = { position:
             dpr={dpr}
             frameloop={visible && !paused ? 'always' : 'never'}
             camera={{ position: camera.position, fov: camera.fov, near: 0.1, far: 100 }}
-            gl={(defaults) => createHardenedRenderer(defaults.canvas as HTMLCanvasElement, { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })}
+            gl={
+              browserWithholdsPrecision()
+                ? (defaults) => createHardenedRenderer(defaults.canvas as HTMLCanvasElement, { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false })
+                : { antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false }
+            }
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0);
               gl.toneMapping = NeutralToneMapping;

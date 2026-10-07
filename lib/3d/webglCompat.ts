@@ -15,7 +15,6 @@ import { report } from '@/lib/diag';
  */
 const FLOAT = { rangeMin: 127, rangeMax: 127, precision: 23 };
 const INT = { rangeMin: 31, rangeMax: 30, precision: 0 };
-let reported = false;
 
 function safePrecision(gl: WebGLRenderingContext | WebGL2RenderingContext, original: (s: GLenum, p: GLenum) => WebGLShaderPrecisionFormat | null) {
   return (shaderType: GLenum, precisionType: GLenum): WebGLShaderPrecisionFormat => {
@@ -26,36 +25,30 @@ function safePrecision(gl: WebGLRenderingContext | WebGL2RenderingContext, origi
       result = null;
     }
     if (result && typeof result.precision === 'number') return result;
-    if (!reported) {
-      reported = true;
-      report('compat', 'browser withheld shader precision (privacy protection) — supplied the WebGL2 default');
-    }
     const isInt = precisionType === gl.LOW_INT || precisionType === gl.MEDIUM_INT || precisionType === gl.HIGH_INT;
     return (isInt ? INT : FLOAT) as WebGLShaderPrecisionFormat;
   };
 }
 
-let patched = false;
-export function patchWebGLForPrivacyBrowsers() {
-  if (patched || typeof window === 'undefined') return;
-  patched = true;
-  for (const ctx of [window.WebGL2RenderingContext, window.WebGLRenderingContext]) {
-    if (!ctx) continue;
-    const proto = ctx.prototype as WebGLRenderingContext;
-    const original = proto.getShaderPrecisionFormat;
-    if (!original) continue;
-    try {
-      Object.defineProperty(proto, 'getShaderPrecisionFormat', {
-        configurable: true,
-        writable: true,
-        value: function (this: WebGLRenderingContext, s: GLenum, p: GLenum) {
-          return safePrecision(this, original)(s, p);
-        },
-      });
-    } catch {
-      // the browser locked the prototype; the per-context proxy below still protects us
-    }
+let withheld: boolean | null = null;
+
+/**
+ * True when this browser withholds shader precision (e.g. Brave Shields).
+ * Probed once on a throwaway context; every other browser keeps the standard
+ * renderer path untouched.
+ */
+export function browserWithholdsPrecision(gl?: WebGL2RenderingContext | null): boolean {
+  if (withheld !== null) return withheld;
+  try {
+    const ctx = gl ?? document.createElement('canvas').getContext('webgl2');
+    if (!ctx) return (withheld = false);
+    const r = ctx.getShaderPrecisionFormat(ctx.VERTEX_SHADER, ctx.HIGH_FLOAT);
+    withheld = !r || typeof r.precision !== 'number';
+  } catch {
+    withheld = true;
   }
+  if (withheld) report('compat', 'browser withholds shader precision (privacy protection) — using the protected context');
+  return withheld;
 }
 
 /** Wraps a context so that getShaderPrecisionFormat can never be null, with bound-method caching. */
