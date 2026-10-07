@@ -10,10 +10,19 @@ page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') 
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
 await page.goto(url, { waitUntil: 'load', timeout: 120000 });
 await page.waitForTimeout(+wait);
-if (+scrollY) {
+let target = +scrollY;
+if (scrollY && isNaN(+scrollY)) {
+  // "selector@offset" scrolls to an element, plus an offset in viewport heights
+  const [sel, off = '0'] = scrollY.split('@');
+  target = await page.evaluate(([s, o]) => {
+    const el = document.querySelector(s);
+    return el ? el.getBoundingClientRect().top + window.scrollY + Number(o) * window.innerHeight : 0;
+  }, [sel, off]);
+}
+if (target) {
   // scroll in steps so scrubbed timelines and Lenis follow naturally
   for (let i = 1; i <= 10; i++) {
-    await page.evaluate((y) => window.scrollTo(0, y), Math.round((+scrollY * i) / 10));
+    await page.evaluate((y) => window.scrollTo(0, y), Math.round((target * i) / 10));
     await page.waitForTimeout(120);
   }
   await page.waitForTimeout(3500);

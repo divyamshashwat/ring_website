@@ -1,0 +1,65 @@
+.section {
+  background: var(--ivory);
+  padding-block: clamp(120px, 16vw, 240px);
+}
+.title {
+  grid-column: 2 / span 10;
+  text-align: center;
+  font-size: clamp(2.9rem, 6vw, 6.4rem);
+  line-height: 0.98;
+}
+.title em {
+  color: var(--gold);
+}
+.body {
+  margin-top: clamp(80px, 10vw, 160px);
+  align-items: start;
+  row-gap: 64px;
+}
+.textCol {
+  grid-column: 2 / span 4;
+  position: sticky;
+  top: calc(var(--header-h) + 60px);
+  display: grid;
+  gap: 32px;
+}
+.textCol p:first-child::first-letter {
+  font-family: var(--font-serif);
+  font-size: 3.6em;
+  float: left;
+  line-height: 0.82;
+  padding: 0.06em 0.1em 0 0;
+  color: var(--ink);
+}
+.images {
+  grid-column: 7 / span 5;
+  display: grid;
+  gap: clamp(80px, 10vw, 160px);
+}
+.figure figcaption {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+.jali {
+  width: 100%;
+  max-width: 340px;
+  color: var(--gold);
+  margin-top: 8px;
+}
+.jali path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.6;
+}
+@media (max-width: 900px) {
+  .title,
+  .textCol,
+  .images {
+    grid-column: 1 / -1;
+  }
+  .textCol {
+    position: static;
+  }
+}

@@ -1,0 +1,140 @@
+.wrap {
+  padding-bottom: clamp(100px, 12vw, 180px);
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(300px, 1fr);
+  gap: clamp(32px, 5vw, 96px);
+  align-items: start;
+}
+.lines {
+  border-top: 1px solid var(--hairline-strong);
+}
+.line {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) auto;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--hairline);
+  align-items: center;
+}
+.thumb {
+  background: var(--pearl);
+  aspect-ratio: 1;
+}
+.lineInfo {
+  display: grid;
+  gap: 6px;
+}
+.qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--hairline);
+  width: max-content;
+}
+.qty button {
+  width: 36px;
+  height: 36px;
+}
+.qty span {
+  min-width: 24px;
+  text-align: center;
+  font-size: var(--fs-small);
+}
+.summary {
+  position: sticky;
+  top: calc(var(--header-h) + 32px);
+  background: var(--porcelain);
+  border: 1px solid var(--hairline);
+  padding: clamp(24px, 3vw, 40px);
+  display: grid;
+  gap: 18px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: var(--fs-small);
+}
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 16px;
+  border-top: 1px solid var(--hairline-strong);
+}
+.total strong {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.8rem;
+}
+.empty {
+  border-top: 1px solid var(--hairline-strong);
+  padding-top: 48px;
+  display: grid;
+  gap: 24px;
+  justify-items: start;
+}
+.form {
+  display: grid;
+  gap: 28px;
+}
+.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 24px;
+}
+.fieldset legend {
+  margin-bottom: 18px;
+  padding: 0;
+}
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.option {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--hairline);
+  font-size: var(--fs-small);
+  transition: border-color 0.4s;
+}
+.option[aria-checked='true'] {
+  border-color: var(--ink);
+  background: var(--porcelain);
+}
+.error {
+  color: #8e2a1c;
+}
+.done {
+  border-top: 1px solid var(--hairline-strong);
+  padding-top: 40px;
+  display: grid;
+  gap: 18px;
+  max-width: 40em;
+}
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .summary {
+    position: static;
+  }
+  .line {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+  .line > :last-child {
+    grid-column: 2;
+  }
+  .two {
+    grid-template-columns: 1fr;
+  }
+}

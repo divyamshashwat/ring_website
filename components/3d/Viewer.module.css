@@ -48,3 +48,12 @@
 .buttons button[aria-pressed='true'] {
   background: var(--porcelain);
 }
+
+@media (max-width: 900px) {
+  .controls {
+    padding: 12px 16px;
+  }
+  .hint {
+    max-width: 6em;
+  }
+}

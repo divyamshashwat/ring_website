@@ -1,0 +1,115 @@
+.hero {
+  position: relative;
+  padding-top: calc(var(--header-h) + clamp(60px, 9vw, 140px));
+  padding-bottom: clamp(60px, 8vw, 120px);
+  background: radial-gradient(70% 60% at 70% 40%, color-mix(in srgb, var(--sw) 9%, var(--porcelain)) 0%, var(--ivory) 70%);
+}
+.name {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(4.4rem, 13vw, 13rem);
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 16px 40px;
+  margin-top: clamp(24px, 3vw, 44px);
+}
+.epithet {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+}
+.assoc {
+  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 32px;
+  align-items: baseline;
+}
+.assoc strong {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.5rem;
+}
+.explore {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: var(--gutter);
+  align-items: center;
+  padding-block: clamp(60px, 8vw, 120px);
+}
+.viewer {
+  height: min(78vh, 720px);
+  position: relative;
+}
+.split {
+  border-top: 1px solid var(--hairline-strong);
+  padding-top: 40px;
+  row-gap: 48px;
+}
+.split > div {
+  grid-column: span 6;
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: 9em 1fr;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline);
+  font-size: var(--fs-small);
+}
+.facts dt {
+  font-size: var(--fs-micro);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.facts dd {
+  font-weight: 300;
+}
+.pieces {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+.pieces a {
+  display: grid;
+  gap: 10px;
+}
+.pieces .img {
+  background: var(--pearl);
+}
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--hairline-strong);
+  padding-top: 32px;
+}
+.pager a {
+  display: grid;
+  gap: 6px;
+}
+@media (max-width: 900px) {
+  .explore {
+    grid-template-columns: 1fr;
+  }
+  .viewer {
+    height: 60vh;
+  }
+  .split > div {
+    grid-column: 1 / -1;
+  }
+  .pieces {
+    grid-template-columns: 1fr;
+  }
+}

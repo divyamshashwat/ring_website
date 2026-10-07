@@ -14,7 +14,7 @@ export default function StudioClient() {
   const product = products.find((p) => p.slug === params.product);
   const config = product?.configuration ?? configFromSearch(params as Record<string, string>);
   return (
-    <main style={{ position: 'fixed', inset: 0, background: params.transparent ? 'transparent' : 'var(--ivory)' }} data-ready={ready ? 'true' : 'false'}>
+    <main style={{ position: 'fixed', inset: 0, zIndex: 1100, background: params.transparent ? 'transparent' : 'var(--ivory)' }} data-ready={ready ? 'true' : 'false'}>
       <StudioScene
         config={config}
         modelPath={params.glb ? product?.modelPath : undefined}

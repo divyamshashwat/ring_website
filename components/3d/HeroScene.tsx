@@ -104,7 +104,7 @@ function HeroRing({ driver }: { driver: HeroDriver }) {
   return (
     <>
       <group ref={ring} onPointerOver={() => setCursor('view')} onPointerOut={() => setCursor('default')}>
-        <ProductModel ref={model} config={HERO_PRODUCT.configuration} modelPath={process.env.NEXT_PUBLIC_NO_GLB ? undefined : HERO_PRODUCT.modelPath} animateChanges={false} />
+        <ProductModel ref={model} config={HERO_PRODUCT.configuration} modelPath={HERO_PRODUCT.modelPath} animateChanges={false} />
       </group>
       <group ref={loose} visible={false} onPointerOver={() => setCursor(driver.interactive > 0.5 ? 'rotate' : 'default')} onPointerOut={() => setCursor('default')}>
         {stoneGeometry && <Gem slug="moonga" geometry={stoneGeometry} />}

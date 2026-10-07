@@ -7,7 +7,7 @@ import { prefersReducedMotion } from '@/lib/motion';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Tag = 'h1' | 'h2' | 'h3' | 'p' | 'div' | 'span' | 'blockquote';
+type Tag = 'h1' | 'h2' | 'h3' | 'p' | 'div' | 'span' | 'blockquote' | 'li';
 
 /**
  * Masked line reveal for important headlines only. Lines are authored, not

@@ -197,6 +197,15 @@
   }
   .stageMeta {
     top: calc(var(--header-h) + 8px);
+    left: 16px;
+    gap: 4px;
+  }
+  .stageMeta > :first-child,
+  .stageMeta > :last-child {
+    display: none;
+  }
+  .stageName {
+    font-size: 1.6rem;
   }
   .panel {
     position: relative;

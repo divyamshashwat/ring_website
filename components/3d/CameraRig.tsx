@@ -79,7 +79,10 @@ export default function CameraRig({ state = 'PRODUCT', pose, driver, zoom, paral
     sp.x = MathUtils.damp(sp.x, pointer.nx, 2.5, dt);
     sp.y = MathUtils.damp(sp.y, pointer.ny, 2.5, dt);
     if (zoom) zoom.value = MathUtils.damp(zoom.value, zoom.target, 6, dt);
-    const z = zoom?.value ?? 1;
+    // portrait screens have a narrow horizontal field of view: pull back so the object still fits
+    const aspect = size.width / Math.max(size.height, 1);
+    const fit = driver || aspect >= 0.95 ? 1 : Math.min(2.1, Math.pow(0.95 / aspect, 0.85));
+    const z = (zoom?.value ?? 1) * fit;
 
     look.set(d.tx, d.ty, d.tz);
     pos.set(d.px, d.py, d.pz).sub(look).multiplyScalar(z).add(look);
