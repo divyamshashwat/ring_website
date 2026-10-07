@@ -2,6 +2,7 @@
 
 import type { StoneSize } from '@/lib/data/types';
 import LooseStone from './LooseStone';
+import { StoneStill } from './Fallbacks';
 import Viewer from './Viewer';
 
 export default function GemstoneViewer({ slug, size = 'medium', className, controls = true, label }: { slug: string; size?: StoneSize; className?: string; controls?: boolean; label?: string }) {
@@ -13,6 +14,7 @@ export default function GemstoneViewer({ slug, size = 'medium', className, contr
       restYaw={0}
       shadow={-0.95}
       controls={controls}
+      fallback={<StoneStill slug={slug} />}
       label={label ?? 'Interactive 3D gemstone'}
     >
       <LooseStone slug={slug} size={size} displaySize={1.25} />

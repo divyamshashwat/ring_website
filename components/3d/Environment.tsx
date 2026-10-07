@@ -2,6 +2,7 @@
 
 import { Environment as DreiEnvironment, Lightformer } from '@react-three/drei';
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
+import { useQuality } from './QualityContext';
 import { Scene } from 'three';
 
 /**
@@ -39,8 +40,10 @@ function Softboxes({ front = 1.6 }: { front?: number }) {
   );
 }
 
-export default function StudioEnvironment({ resolution = 256, children }: { resolution?: number; children?: ReactNode }) {
+export default function StudioEnvironment({ resolution, children }: { resolution?: number; children?: ReactNode }) {
   const gemScene = useMemo(() => new Scene(), []);
+  const tier = useQuality();
+  resolution ??= tier === 'high' ? 256 : 128;
   return (
     <GemEnvContext.Provider value={gemScene}>
       <DreiEnvironment resolution={resolution} frames={1}>

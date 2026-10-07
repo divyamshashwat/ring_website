@@ -52,7 +52,8 @@ export default function Loader() {
     });
     if (useUI.getState().sceneReady) finish();
     // never hold the visitor: a returning visit or a slow device continues regardless
-    const timeout = setTimeout(finish, seen ? 1200 : 7000);
+    const touch = window.matchMedia('(pointer: coarse)').matches;
+    const timeout = setTimeout(finish, seen ? 1200 : touch ? 4000 : 7000);
     return () => {
       unsub();
       clearTimeout(timeout);

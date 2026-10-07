@@ -101,6 +101,7 @@ interface ViewerProps {
   /** extra scene content outside the rotating group */
   extras?: ReactNode;
   cameraDuration?: number;
+  fallback?: ReactNode;
 }
 
 /**
@@ -124,6 +125,7 @@ export default function Viewer({
   sweepRef,
   extras,
   cameraDuration = 0,
+  fallback,
 }: ViewerProps) {
   const zoom = useMemo<ZoomRef>(() => ({ value: 1, target: 1, min: 0.45, max: 1.6 }), []);
   const ownApi = useRef<ViewerApi | null>(null);
@@ -133,7 +135,7 @@ export default function Viewer({
   return (
     <div className={`${styles.viewer} ${className ?? ''}`} data-lenis-prevent={wheelZoom ? '' : undefined} data-cursor="rotate">
       <div className={styles.canvasArea}>
-      <Stage style={{ position: 'absolute', inset: 0 }} camera={{ position: pose.position, fov: pose.fov }} ariaLabel={label}>
+      <Stage style={{ position: 'absolute', inset: 0 }} camera={{ position: pose.position, fov: pose.fov }} ariaLabel={label} fallback={fallback}>
         <MaterialLibraryProvider metal={metal} purity={purity}>
           <StudioEnvironment />
           <LightingRig follow={0.12} sweepRef={sweepRef} />

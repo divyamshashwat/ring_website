@@ -2,6 +2,7 @@
 
 import type { Configuration } from '@/lib/data/types';
 import ProductModel from './ProductModel';
+import { ProductStill } from './Fallbacks';
 import Viewer from './Viewer';
 
 /** A single display object for editorial product presentation (no visible controls). */
@@ -19,6 +20,7 @@ export default function ShowcaseScene({ config, label }: { config: Configuration
       restPitch={pendant ? 0.1 : 0.6}
       restYaw={pendant ? 0.35 : -0.62}
       shadow={bracelet ? -2.25 : pendant ? -1.0 : -1.32}
+      fallback={<ProductStill config={config} />}
       label={label}
     >
       <ProductModel config={config} />

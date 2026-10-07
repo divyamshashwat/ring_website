@@ -2,7 +2,7 @@
 
 import { Canvas, useThree } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
-import { Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Component, Suspense, useEffect, useRef, useState, type CSSProperties, type ErrorInfo, type ReactNode } from 'react';
 import { NeutralToneMapping, SRGBColorSpace } from 'three';
 import { detectQuality, QUALITY, type QualityTier } from '@/lib/3d/quality';
 import { QualityContext } from './QualityContext';
@@ -19,6 +19,8 @@ interface StageProps {
   /** keep the WebGL context alive while far off-screen (default: only on high tier) */
   persistent?: boolean;
   ariaLabel?: string;
+  /** shown instead of the 3D scene when WebGL is unavailable, fails, or the GPU drops the context */
+  fallback?: ReactNode;
 }
 
 function ReadySignal({ onReady }: { onReady?: () => void }) {
@@ -37,20 +39,56 @@ function ReadySignal({ onReady }: { onReady?: () => void }) {
   return null;
 }
 
+/** Contains any 3D failure to its own canvas instead of taking the page down. */
+class SceneBoundary extends Component<{ children: ReactNode; onError: () => void }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.warn('[vyoma] 3D scene disabled:', error.message, info.componentStack?.split('\n')[1] ?? '');
+    this.props.onError();
+  }
+  render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+let webglSupport: boolean | null = null;
+function supportsWebGL2() {
+  if (webglSupport !== null) return webglSupport;
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2');
+    webglSupport = !!gl;
+    (gl?.getExtension('WEBGL_lose_context') as { loseContext?: () => void } | null)?.loseContext?.();
+  } catch {
+    webglSupport = false;
+  }
+  return webglSupport;
+}
+
 /**
- * A lazily-mounted, visibility-aware WebGL canvas.
- *  - mounts when within ~1 viewport, pauses the render loop when off-screen
- *  - on medium/low tiers, unmounts when far away to free GPU memory
+ * A lazily-mounted, visibility-aware, failure-safe WebGL canvas.
+ *  - mounts when near the viewport, pauses the render loop when off-screen
+ *  - on medium/low tiers (phones), unmounts when away from the viewport to free GPU memory
  *  - adaptive DPR via PerformanceMonitor, tone mapping tuned for product colour
+ *  - if WebGL is missing, a scene throws, or the GPU drops the context, the
+ *    fallback is shown and the rest of the page keeps working
  */
-export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel }: StageProps) {
+export default function Stage({ children, className, style, camera = { position: [0, 0.6, 7], fov: 26 }, paused = false, onReady, persistent, ariaLabel, fallback = null }: StageProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [tier, setTier] = useState<QualityTier>('high');
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [dpr, setDpr] = useState(1);
 
   useEffect(() => {
+    if (!supportsWebGL2()) {
+      setFailed(true);
+      return;
+    }
     const t = detectQuality();
     setTier(t);
     setDpr(Math.min(window.devicePixelRatio, QUALITY[t].dpr[1]));
@@ -62,7 +100,7 @@ export default function Stage({ children, className, style, camera = { position:
         if (entry.isIntersecting) setMounted(true);
         else if (!keep) setMounted(false);
       },
-      { rootMargin: '120% 0px 120% 0px' },
+      { rootMargin: t === 'high' ? '120% 0px 120% 0px' : '50% 0px 50% 0px' },
     );
     const view = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { rootMargin: '10% 0px 10% 0px' });
     near.observe(el);
@@ -76,32 +114,42 @@ export default function Stage({ children, className, style, camera = { position:
   const q = QUALITY[tier];
   return (
     <div ref={ref} className={className} style={{ position: 'relative', ...style }} role={ariaLabel ? 'img' : undefined} aria-label={ariaLabel}>
-      {mounted && (
-        <Canvas
-          dpr={dpr}
-          frameloop={visible && !paused ? 'always' : 'never'}
-          camera={{ position: camera.position, fov: camera.fov, near: 0.1, far: 100 }}
-          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false }}
-          onCreated={({ gl }) => {
-            gl.setClearColor(0x000000, 0);
-            gl.toneMapping = NeutralToneMapping;
-            gl.toneMappingExposure = 1.0;
-            gl.outputColorSpace = SRGBColorSpace;
-            gl.transmissionResolutionScale = q.transmissionScale;
-          }}
-          style={{ position: 'absolute', inset: 0 }}
-        >
-          <PerformanceMonitor
-            onDecline={() => setDpr((d) => Math.max(q.dpr[0], Math.round((d - 0.25) * 100) / 100))}
-            onIncline={() => setDpr((d) => Math.min(q.dpr[1], window.devicePixelRatio, Math.round((d + 0.25) * 100) / 100))}
-          />
-          <QualityContext.Provider value={tier}>
-            <Suspense fallback={null}>
-              {children}
-              <ReadySignal onReady={onReady} />
-            </Suspense>
-          </QualityContext.Provider>
-        </Canvas>
+      {failed && fallback}
+      {mounted && !failed && (
+        <SceneBoundary onError={() => setFailed(true)}>
+          <Canvas
+            dpr={dpr}
+            frameloop={visible && !paused ? 'always' : 'never'}
+            camera={{ position: camera.position, fov: camera.fov, near: 0.1, far: 100 }}
+            gl={{ antialias: tier !== 'low', alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: false }}
+            onCreated={({ gl }) => {
+              gl.setClearColor(0x000000, 0);
+              gl.toneMapping = NeutralToneMapping;
+              gl.toneMappingExposure = 1.0;
+              gl.outputColorSpace = SRGBColorSpace;
+              gl.transmissionResolutionScale = q.transmissionScale;
+              const canvas = gl.domElement;
+              // a context lost while the canvas is still on the page means the GPU gave up: show the still
+              canvas.addEventListener('webglcontextlost', () => {
+                setTimeout(() => {
+                  if (canvas.isConnected && gl.getContext().isContextLost()) setFailed(true);
+                }, 1200);
+              });
+            }}
+            style={{ position: 'absolute', inset: 0 }}
+          >
+            <PerformanceMonitor
+              onDecline={() => setDpr((d) => Math.max(q.dpr[0], Math.round((d - 0.25) * 100) / 100))}
+              onIncline={() => setDpr((d) => Math.min(q.dpr[1], window.devicePixelRatio, Math.round((d + 0.25) * 100) / 100))}
+            />
+            <QualityContext.Provider value={tier}>
+              <Suspense fallback={null}>
+                {children}
+                <ReadySignal onReady={onReady} />
+              </Suspense>
+            </QualityContext.Provider>
+          </Canvas>
+        </SceneBoundary>
       )}
     </div>
   );

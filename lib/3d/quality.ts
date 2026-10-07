@@ -15,7 +15,9 @@ export function detectQuality(): QualityTier {
   const coarse = window.matchMedia('(pointer: coarse)').matches;
   const small = Math.min(window.innerWidth, window.innerHeight) < 600;
   const saveData = nav.connection?.saveData === true;
-  if (saveData || cores <= 4 || memory <= 3) cached = 'low';
+  // phones share a small GPU memory budget across every tab: always the light tier
+  const phone = coarse && small;
+  if (saveData || phone || cores <= 4 || memory <= 3) cached = 'low';
   else if (coarse || small || cores <= 6) cached = 'medium';
   else cached = 'high';
   return cached;

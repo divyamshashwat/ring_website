@@ -58,10 +58,10 @@ export function createScratchTexture(size = 1024): Texture {
   return texture;
 }
 
-export function createHallmarkTexture(text: string): CanvasTexture {
+export function createHallmarkTexture(text: string, width = 2048): CanvasTexture {
   const canvas = document.createElement('canvas');
-  canvas.width = 2048;
-  canvas.height = 512;
+  canvas.width = width;
+  canvas.height = width / 4;
   drawHallmark(canvas.getContext('2d')!, canvas.width, canvas.height, text);
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = LinearSRGBColorSpace;

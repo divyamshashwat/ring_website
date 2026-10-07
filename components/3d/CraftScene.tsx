@@ -9,6 +9,7 @@ import LightingRig from './LightingRig';
 import { MaterialLibraryProvider } from './MaterialLibrary';
 import ProductModel, { type ProductLayout } from './ProductModel';
 import Stage from './Stage';
+import { ProductStill } from './Fallbacks';
 
 export const CRAFT_CONFIG: Configuration = { type: 'ring', stone: 'lehsunia', metal: 'yellow-gold', purity: '22k', stoneSize: 'medium', style: 'heritage', size: 7 };
 
@@ -48,7 +49,7 @@ export default function CraftScene({ driver, onLayout }: { driver: CameraDriver;
   );
   const config = useMemo(() => CRAFT_CONFIG, []);
   return (
-    <Stage style={{ width: '100%', height: '100%' }} camera={{ position: [3.6, 2.3, 5.4], fov: 24 }} ariaLabel="Macro views of a heritage ring: bezel, milgrain, granulation, hallmark and polish">
+    <Stage style={{ width: '100%', height: '100%' }} fallback={<ProductStill slug="lehsunia-ring" />} camera={{ position: [3.6, 2.3, 5.4], fov: 24 }} ariaLabel="Macro views of a heritage ring: bezel, milgrain, granulation, hallmark and polish">
       <MaterialLibraryProvider metal="yellow-gold" purity="22k">
         <StudioEnvironment />
         <LightingRig follow={0.1} drift={0.12} />

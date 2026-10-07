@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { Mesh, SphereGeometry } from 'three';
 import ProductModel, { type SwapKind } from '@/components/3d/ProductModel';
 import { useMaterials } from '@/components/3d/MaterialLibrary';
+import { ProductStill } from '@/components/3d/Fallbacks';
 import Viewer, { type ViewerApi } from '@/components/3d/Viewer';
 import { GEM_SPECS } from '@/lib/3d/materials/gemstone';
 import type { Configuration } from '@/lib/data/types';
@@ -69,6 +70,7 @@ export default function ConfiguratorScene({ config, label }: { config: Configura
       restPitch={pendant ? 0.1 : 0.62}
       restYaw={pendant ? 0.35 : -0.62}
       shadow={bracelet ? -2.25 : pendant ? -1.0 : -1.32}
+      fallback={<ProductStill config={config} />}
       label={label}
       extras={<Warmup />}
       cameraDuration={1.4}

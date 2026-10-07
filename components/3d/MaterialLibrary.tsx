@@ -7,6 +7,7 @@ import { createMetalMaterial, metalTarget } from '@/lib/3d/materials/metal';
 import { createGemMaterial, setGemDim, type GemMaterial } from '@/lib/3d/materials/gemstone';
 import { createHallmarkTexture, createScratchTexture, updateHallmarkTexture } from '@/lib/3d/textures/metalTextures';
 import type { MetalId, Purity } from '@/lib/data/types';
+import { detectQuality } from '@/lib/3d/quality';
 
 /**
  * One material library per canvas: materials and textures are created once,
@@ -35,8 +36,9 @@ export function useMaterials() {
 export function MaterialLibraryProvider({ children, metal = 'yellow-gold', purity = '22k' }: { children: ReactNode; metal?: MetalId; purity?: Purity }) {
   const lib = useMemo(() => {
     const textures: Texture[] = [];
-    const scratches = createScratchTexture(1024);
-    const hallmark: CanvasTexture = createHallmarkTexture(`VYOMA  ${purity.toUpperCase()}`);
+    const light = detectQuality() !== 'high';
+    const scratches = createScratchTexture(light ? 512 : 1024);
+    const hallmark: CanvasTexture = createHallmarkTexture(`VYOMA  ${purity.toUpperCase()}`, light ? 1024 : 2048);
     textures.push(scratches, hallmark);
     const metalMaterial = createMetalMaterial(metal, purity, { roughness: scratches });
     const shank = createMetalMaterial(metal, purity, { roughness: scratches, bump: hallmark });
