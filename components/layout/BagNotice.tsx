@@ -36,7 +36,7 @@ export default function BagNotice() {
         animation: 'drop 0.8s var(--ease) both',
       }}
     >
-      <p className="eyebrow">Added to your bag</p>
+      <p className="label">Added to your bag</p>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
         <span className="h3" style={{ fontSize: '1.4rem' }}>
           {item.name}

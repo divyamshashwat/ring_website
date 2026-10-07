@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import PageIntro from './PageIntro';
 
 /** Long-form utility pages (shipping, care, legal): quiet, readable, with a section index. */
-export default function InfoPage({ eyebrow, title, lead, sections }: { eyebrow: string; title: ReactNode[]; lead?: string; sections: { id: string; heading: string; body: ReactNode }[] }) {
+export default function InfoPage({ title, lead, sections }: { title: ReactNode[]; lead?: string; sections: { id: string; heading: string; body: ReactNode }[] }) {
   return (
     <>
-      <PageIntro eyebrow={eyebrow} lines={title} lead={lead} compact />
+      <PageIntro lines={title} lead={lead} compact />
       <div className="container" style={{ paddingBottom: 'clamp(100px, 12vw, 180px)' }}>
         <div className="grid info-grid" style={{ borderTop: '1px solid var(--hairline-strong)', paddingTop: 48, rowGap: 40 }}>
           <nav aria-label="On this page" style={{ gridColumn: '1 / span 3', alignSelf: 'start', position: 'sticky', top: 'calc(var(--header-h) + 32px)' }} className="info-nav">

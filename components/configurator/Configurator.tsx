@@ -83,15 +83,14 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
   return (
     <section className={styles.root} aria-labelledby="configurator-title">
       <div className={styles.stage}>
-        <div className={styles.stageInner}>
-          <ConfiguratorScene config={config} label={`${name} in ${config.purity.toUpperCase()} ${config.metal.replace('-', ' ')}, interactive 3D model`} />
-        </div>
         <div className={styles.stageMeta} aria-hidden="true">
-          <span className="eyebrow">04 — Create your piece</span>
           <span className={styles.stageName}>{name}</span>
           <span className="small muted">
             {gem.englishName} · {config.purity.toUpperCase()} {METAL_OPTIONS.find((m) => m.id === config.metal)!.label.toLowerCase()} · {style.label}
           </span>
+        </div>
+        <div className={styles.stageInner}>
+          <ConfiguratorScene config={config} label={`${name} in ${config.purity.toUpperCase()} ${config.metal.replace('-', ' ')}, interactive 3D model`} />
         </div>
       </div>
 
@@ -110,7 +109,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group(null)}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Piece</span>
+            <span className="label">Piece</span>
           </div>
           <div className={styles.row} role="radiogroup" aria-label="Type of piece">
             {TYPES.map((t) => (
@@ -123,13 +122,13 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group('stone')}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Stone</span>
+            <span className="label">Stone</span>
             <span className={styles.value}>
               {gem.name} · {gem.englishName}
             </span>
           </div>
           <div className={styles.stones} role="radiogroup" aria-label="Gemstone">
-            <span className={`${styles.subhead} micro muted`}>Navratna</span>
+            <span className={`${styles.subhead} small muted`}>Navratna</span>
             {ordered.map((g, i) => (
               <FragmentWithDivider key={g.slug} divider={i === 9}>
                 <button type="button" role="radio" aria-checked={config.stone === g.slug} className={styles.stoneBtn} onClick={() => set('stone', g.slug)}>
@@ -149,7 +148,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group('metal')}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Metal</span>
+            <span className="label">Metal</span>
             <span className={styles.value}>{METAL_OPTIONS.find((m) => m.id === config.metal)!.label}</span>
           </div>
           <div className={styles.row} role="radiogroup" aria-label="Metal">
@@ -161,7 +160,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
             ))}
           </div>
           <div className={styles.groupHead} style={{ marginTop: 22 }}>
-            <span className="eyebrow">Purity</span>
+            <span className="label">Purity</span>
           </div>
           <div className={styles.row} role="radiogroup" aria-label="Gold purity">
             {PURITY_OPTIONS.map((p) => (
@@ -183,7 +182,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group('size')}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Stone size</span>
+            <span className="label">Stone size</span>
             <span className={styles.value}>approx. {carats.toFixed(2)} ct</span>
           </div>
           <div className={styles.row} role="radiogroup" aria-label="Stone size">
@@ -214,7 +213,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
           {config.type === 'ring' && (
             <>
               <div className={styles.groupHead} style={{ marginTop: 22 }}>
-                <span className="eyebrow">Ring size</span>
+                <span className="label">Ring size</span>
                 <TransitionLink href="/care#sizing" className="micro muted">
                   Size guide
                 </TransitionLink>
@@ -233,7 +232,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group('style')}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Style</span>
+            <span className="label">Style</span>
             <span className={styles.value}>{style.label}</span>
           </div>
           <div className={styles.row} role="radiogroup" aria-label="Style">
@@ -248,7 +247,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.group} {...group(null)}>
           <div className={styles.groupHead}>
-            <span className="eyebrow">Certification</span>
+            <span className="label">Certification</span>
           </div>
           <p className="small" style={{ color: 'var(--ink-soft)', fontWeight: 300 }}>
             Every stone is accompanied by an independent gemmological laboratory report stating species, weight, measurements and any treatment.
@@ -257,7 +256,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 
         <div className={styles.summary}>
           <div className={styles.price}>
-            <span className="eyebrow">Indicative price</span>
+            <span className="label">Indicative price</span>
             <strong>{formatPrice(price)}</strong>
           </div>
           <button type="button" className="btn btn--solid btn--block" onClick={() => add({ name, configuration: { ...config }, price })}>
@@ -281,7 +280,7 @@ export default function Configurator({ initial, syncUrl = false, headingLevel = 
 function FragmentWithDivider({ divider, children }: { divider: boolean; children: React.ReactNode }) {
   return (
     <>
-      {divider && <span className={`${styles.subhead} micro muted`}>Uparatna</span>}
+      {divider && <span className={`${styles.subhead} small muted`}>Uparatna</span>}
       {children}
     </>
   );

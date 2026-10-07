@@ -28,7 +28,7 @@ export default function Checkout() {
   if (state === 'done') {
     return (
       <div className={styles.done} role="status">
-        <p className="eyebrow">Order received</p>
+        <p className="label">Order received</p>
         <p className="h2">Thank you, {form.name.split(' ')[0]}.</p>
         <p className="body">
           Your order number is <strong>{orderId}</strong>. A gemmologist will contact you at {form.email} within one working day to confirm your stone and share its laboratory report, followed by a secure payment link.
@@ -87,7 +87,7 @@ export default function Checkout() {
     <div className={styles.layout}>
       <form className={styles.form} onSubmit={submit} noValidate>
         <fieldset className={styles.fieldset}>
-          <legend className="eyebrow">01 · Contact</legend>
+          <legend className="label">01 · Contact</legend>
           <div className="field">
             <label htmlFor="co-name">Full name</label>
             <input id="co-name" autoComplete="name" required value={form.name} onChange={set('name')} />
@@ -104,7 +104,7 @@ export default function Checkout() {
           </div>
         </fieldset>
         <fieldset className={styles.fieldset}>
-          <legend className="eyebrow">02 · Delivery</legend>
+          <legend className="label">02 · Delivery</legend>
           <div className="field">
             <label htmlFor="co-address">Address</label>
             <input id="co-address" autoComplete="street-address" required value={form.address} onChange={set('address')} />
@@ -125,7 +125,7 @@ export default function Checkout() {
           </div>
         </fieldset>
         <fieldset className={styles.fieldset}>
-          <legend className="eyebrow">03 · Payment</legend>
+          <legend className="label">03 · Payment</legend>
           <p className="body small">
             Once a gemmologist has confirmed your stone and shared its report, we send a secure payment link (cards, UPI, net banking) through an RBI-regulated payment gateway. Nothing is charged today.
           </p>
@@ -140,7 +140,7 @@ export default function Checkout() {
         </button>
       </form>
       <aside className={styles.summary} aria-label="Order summary">
-        <p className="eyebrow">Your order</p>
+        <p className="label">Your order</p>
         {items.map((i) => (
           <div key={i.key} className={styles.row} style={{ alignItems: 'baseline' }}>
             <span>
@@ -153,7 +153,7 @@ export default function Checkout() {
           </div>
         ))}
         <div className={styles.total}>
-          <span className="eyebrow">Total</span>
+          <span className="label">Total</span>
           <strong>{formatPrice(total)}</strong>
         </div>
         <p className="small muted">Including GST and insured delivery. Each stone is accompanied by an independent laboratory report.</p>

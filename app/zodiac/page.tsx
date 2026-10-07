@@ -15,7 +15,6 @@ export default function ZodiacPage() {
   return (
     <>
       <PageIntro
-        eyebrow="The Zodiac"
         lines={['Twelve signs.', <em key="e">Seven rulers.</em>]}
         lead="Vedic astrology uses the sidereal zodiac. Each rashi is ruled by a planet, and each planet is traditionally associated with a stone. Dates below are for the Sun’s sidereal sign and shift by a day between years."
         aside={

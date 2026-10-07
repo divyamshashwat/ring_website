@@ -20,9 +20,6 @@ export default function Trust() {
     <section className={styles.section} aria-labelledby="trust-title">
       <div className="container grid">
         <div className={styles.title}>
-          <p className="eyebrow" style={{ marginBottom: 28 }}>
-            08 — Our undertaking
-          </p>
           <MaskedLines as="h2" className="h2" lines={['What you can', <em key="e">rely upon.</em>]} />
           <span id="trust-title" className="visually-hidden">
             Our undertaking

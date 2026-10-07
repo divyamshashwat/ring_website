@@ -7,7 +7,6 @@ export const metadata: Metadata = pageMetadata({ title: 'Returns', description: 
 export default function ReturnsPage() {
   return (
     <InfoPage
-      eyebrow="Client care"
       title={['Returns.']}
       sections={[
         { id: 'collection', heading: 'Pieces from the collection', body: <p>Unworn pieces from the collection may be returned within 15 days of delivery, with their report and certificate, for a full refund.</p> },

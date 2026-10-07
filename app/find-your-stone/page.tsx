@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata({
 export default function FindYourStonePage() {
   return (
     <div style={{ paddingTop: 'var(--header-h)' }}>
-      <FindYourStone headingLevel="h1" eyebrow="Find your stone" />
+      <FindYourStone headingLevel="h1" />
     </div>
   );
 }

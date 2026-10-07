@@ -44,9 +44,6 @@ export default function Constellation() {
       <div className="container">
         <div className={`grid ${styles.head}`}>
           <div className={styles.title}>
-            <p className="eyebrow" style={{ marginBottom: 28 }}>
-              02 — Navratna
-            </p>
             <MaskedLines as="h2" className="h1" lines={['Nine stones.', <em key="e">Nine celestial bodies.</em>]} />
           </div>
           <Reveal className={styles.intro}>
@@ -62,9 +59,6 @@ export default function Constellation() {
           The Navratna and uparatna stones
         </span>
         <ConstellationScene stones={ordered} state={state} onHover={hover} onSelect={select} />
-        <div className={`${styles.legend} micro muted`} aria-hidden="true">
-          <span>The nine — Navratna · behind, the uparatna</span>
-        </div>
       </div>
 
       <div className="container">
@@ -74,7 +68,7 @@ export default function Constellation() {
               <div>
                 <div className={styles.focusName}>
                   <strong>{focus.name}</strong>
-                  <span className="eyebrow">{focus.englishName}</span>
+                  <span className="lead">{focus.englishName}</span>
                 </div>
                 <p className={`${styles.focusMeta} small muted`}>
                   {focus.group === 'navratna' ? 'Navratna' : 'Uparatna'} · traditionally associated with {focus.planet.name} ({focus.planet.vedic}) · {focus.traditionalAssociations.join(', ')}

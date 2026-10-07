@@ -10,18 +10,20 @@
   top: 0;
   height: 100vh;
   height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--header-h);
 }
 .stageInner {
-  position: absolute;
-  inset: var(--header-h) var(--gutter) 0 var(--margin);
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 var(--gutter) 0 var(--margin);
 }
 .stageMeta {
-  position: absolute;
-  left: var(--margin);
-  top: calc(var(--header-h) + 24px);
+  padding: 24px var(--gutter) 8px var(--margin);
   display: grid;
   gap: 8px;
-  pointer-events: none;
 }
 .stageName {
   font-family: var(--font-serif);
@@ -193,14 +195,12 @@
     z-index: 0;
   }
   .stageInner {
-    inset: var(--header-h) 0 0 0;
+    margin: 0;
   }
   .stageMeta {
-    top: calc(var(--header-h) + 8px);
-    left: 16px;
-    gap: 4px;
+    padding: 12px var(--margin) 0;
+    gap: 2px;
   }
-  .stageMeta > :first-child,
   .stageMeta > :last-child {
     display: none;
   }

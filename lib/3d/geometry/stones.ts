@@ -1,5 +1,5 @@
 import { BufferGeometry, Vector3 } from 'three';
-import { facetedGeometry, parametricSurface, seeded } from './parametric';
+import { facetedGeometry, orientOutward, parametricSurface, seeded } from './parametric';
 
 /**
  * Gemstone cuts. All dimensions are in centimetres (1 scene unit = 1 cm), so a
@@ -210,6 +210,14 @@ function emeraldStep(shape: StoneShape): BufferGeometry {
 }
 
 export function buildStoneGeometry(shape: StoneShape, quality: 'high' | 'medium' | 'low' = 'high'): BufferGeometry {
+  const g = buildStone(shape, quality);
+  g.computeBoundingBox();
+  const c = g.boundingBox!.getCenter(new Vector3());
+  orientOutward(g, (_p, k) => k.copy(c));
+  return g;
+}
+
+function buildStone(shape: StoneShape, quality: 'high' | 'medium' | 'low'): BufferGeometry {
   const seg = quality === 'high' ? 96 : quality === 'medium' ? 72 : 48;
   switch (shape.cut) {
     case 'cabochon':

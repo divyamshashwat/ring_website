@@ -15,7 +15,6 @@ export default async function CollectionsPage() {
   return (
     <>
       <PageIntro
-        eyebrow="The Collection"
         lines={['One stone,', <em key="e">one setting.</em>]}
         lead="Every piece is made around a single natural stone, chosen for it and documented with it. Each can also be made to your own specification."
       />

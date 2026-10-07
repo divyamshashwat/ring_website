@@ -3,7 +3,6 @@ import { TransitionLink } from '@/components/layout/PageTransition';
 export default function NotFound() {
   return (
     <section className="container" style={{ minHeight: '80vh', display: 'grid', alignContent: 'center', gap: 28, paddingTop: 'var(--header-h)' }}>
-      <p className="eyebrow">Not found</p>
       <h1 className="display">
         This page has <em>slipped its setting.</em>
       </h1>

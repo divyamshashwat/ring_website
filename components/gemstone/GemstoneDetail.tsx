@@ -17,18 +17,15 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
     <article style={{ ['--sw' as string]: gem.swatch }}>
       <header className={styles.hero}>
         <div className="container">
-          <p className="eyebrow" style={{ marginBottom: 24 }}>
-            {gem.group === 'navratna' ? 'Navratna' : 'Uparatna'} · {gem.englishName}
-          </p>
           <MaskedLines as="h1" className={styles.name} lines={[gem.name]} immediate delay={0.1} />
           <div className={styles.sub}>
             <span className={styles.epithet}>{gem.epithet}</span>
-            <span className="micro muted">
-              {gem.planet.name} · {gem.planet.vedic}
+            <span className="lead">
+              {gem.englishName} · {gem.group === 'navratna' ? 'Navratna' : 'Uparatna'} · {gem.planet.name} ({gem.planet.vedic})
             </span>
           </div>
           <div className={styles.assoc}>
-            <span className="eyebrow">Traditionally associated with</span>
+            <span className="label">Traditionally associated with</span>
             {gem.traditionalAssociations.map((a) => (
               <strong key={a}>{a}</strong>
             ))}
@@ -42,10 +39,9 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
             <GemstoneViewer slug={gem.slug} label={`${gem.englishName}, interactive 3D gemstone`} />
           </div>
           <div style={{ display: 'grid', gap: 24 }}>
-            <p className="eyebrow" id="explore-title">
-              Explore the stone
+            <p className="h2" id="explore-title">
+              {gem.description}
             </p>
-            <p className="h2">{gem.description}</p>
             <p className="small muted">Drag to rotate. Pinch or scroll over the stone to look closer.</p>
           </div>
         </div>
@@ -54,7 +50,7 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
       <section className="container" style={{ paddingBottom: 'clamp(90px, 11vw, 160px)' }} aria-label="Gemmology and tradition">
         <div className={`grid ${styles.split}`}>
           <Reveal>
-            <p className="eyebrow">What gemmology verifies</p>
+            <p className="label">What gemmology verifies</p>
             <dl className={styles.facts}>
               <div>
                 <dt>Species</dt>
@@ -89,7 +85,7 @@ export default function GemstoneDetail({ gem, pieces, prev, next }: { gem: Gemst
             </dl>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="eyebrow">What tradition holds</p>
+            <p className="label">What tradition holds</p>
             <p className="h3">{gem.traditionNote}</p>
             <p className="body">
               These associations come from Jyotish, the Vedic astrological tradition. They are cultural beliefs, offered here as context for choosing a stone — not as claims of any effect.

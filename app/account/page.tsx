@@ -15,7 +15,6 @@ export default function AccountPage() {
   return (
     <>
       <PageIntro
-        eyebrow="Account"
         lines={['Your account.']}
         compact
         lead="Client accounts — order history, certificates and saved configurations in one place — open shortly. Until then, everything below is available without signing in."

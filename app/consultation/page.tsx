@@ -13,7 +13,6 @@ export default function ConsultationPage() {
   return (
     <>
       <PageIntro
-        eyebrow="Consultation"
         lines={['A conversation,', <em key="e">not a sale.</em>]}
         lead="Forty-five minutes with a gemmologist to look at stones together, by video or at the atelier. If you would like a traditional reading, an astrologer can join — share your birth details below."
       />

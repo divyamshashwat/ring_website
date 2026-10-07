@@ -1,6 +1,6 @@
 import { BufferGeometry, CatmullRomCurve3, Curve, Matrix4, SphereGeometry, TorusGeometry, TubeGeometry, Vector2, Vector3 } from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { lerp, parametricSurface, smoothstep, spow } from './parametric';
+import { lerp, orientOutward, parametricSurface, smoothstep, spow } from './parametric';
 import { buildStoneGeometry, stoneMetrics, type StoneShape } from './stones';
 
 export type RingStyle = 'classic' | 'minimal' | 'heritage' | 'contemporary';
@@ -98,7 +98,7 @@ function shankGeometry(spec: StyleSpec, innerR: number, q: Quality, openGap = 0)
   const [t1, w1] = spec.bandTop;
   const start = openGap;
   const span = 1 - openGap * 2;
-  return parametricSurface(
+  const geometry = parametricSurface(
     Math.round(220 * s),
     Math.round(56 * s),
     (u, v, target) => {
@@ -117,6 +117,13 @@ function shankGeometry(spec: StyleSpec, innerR: number, q: Quality, openGap = 0)
     },
     { wrapU: openGap === 0, wrapV: true, uvScale: [1, 1] },
   );
+  // outward from the band's centre-line circle
+  const midR = innerR + (t0 + t1) / 4;
+  orientOutward(geometry, (p, k) => {
+    const r = Math.hypot(p.x, p.y) || 1;
+    return k.set((p.x / r) * midR, (p.y / r) * midR, 0);
+  });
+  return geometry;
 }
 
 /** Closed profile for the bezel cup in (outward offset d, height y) space. */
@@ -250,6 +257,16 @@ function bezelGeometry(spec: StyleSpec, shape: StoneShape, q: Quality): { geomet
     },
     { wrapU: true, wrapV: true },
   );
+  // outward from the profile's centre, carried around the girdle outline
+  const dMid = spec.bezelWall * 0.45;
+  const yMid = (lipH - depth) / 2;
+  orientOutward(geometry, (q, k) => {
+    const angle = Math.atan2(q.z / shape.b, q.x / shape.a);
+    outline.point(angle, p);
+    outline.normal(angle, n);
+    const d = dMid - taper * Math.min(Math.max(-q.y / depth, 0), 1);
+    return k.set(p.x + n.x * d, yMid, p.y + n.y * d);
+  });
   return { geometry, depth, lipH };
 }
 
@@ -260,7 +277,7 @@ function seatGeometry(shape: StoneShape, depth: number, q: Quality): BufferGeome
   const taper = taperFor(shape);
   const p = new Vector2();
   const n = new Vector2();
-  return parametricSurface(
+  const geometry = parametricSurface(
     Math.round(96 * s),
     16,
     (u, v, target) => {
@@ -275,6 +292,8 @@ function seatGeometry(shape: StoneShape, depth: number, q: Quality): BufferGeome
     },
     { wrapU: true },
   );
+  orientOutward(geometry, (_q, k) => k.set(0, -depth - 0.012, 0));
+  return geometry;
 }
 
 /** Cast gallery: a tapering collar that carries the bezel down into the shoulders. */
@@ -285,7 +304,7 @@ function galleryGeometry(spec: StyleSpec, shape: StoneShape, depth: number, heig
   const taper = taperFor(shape);
   const p = new Vector2();
   const n = new Vector2();
-  return parametricSurface(
+  const geometry = parametricSurface(
     Math.round(128 * s),
     Math.round(24 * s),
     (u, v, target) => {
@@ -299,6 +318,8 @@ function galleryGeometry(spec: StyleSpec, shape: StoneShape, depth: number, heig
     },
     { wrapU: true },
   );
+  orientOutward(geometry, (q, k) => k.set(0, q.y, 0));
+  return geometry;
 }
 
 function milgrain(shape: StoneShape, spec: StyleSpec, y: number, offset: number, radius: number): BufferGeometry {

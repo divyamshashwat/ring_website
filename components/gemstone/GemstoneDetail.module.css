@@ -21,7 +21,6 @@
 }
 .epithet {
   font-family: var(--font-serif);
-  font-style: italic;
   font-size: clamp(1.6rem, 2.6vw, 2.4rem);
 }
 .assoc {
@@ -67,9 +66,6 @@
   font-size: var(--fs-small);
 }
 .facts dt {
-  font-size: var(--fs-micro);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--muted);
   padding-top: 2px;
 }

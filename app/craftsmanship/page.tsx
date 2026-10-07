@@ -24,7 +24,6 @@ export default function CraftsmanshipPage() {
   return (
     <>
       <PageIntro
-        eyebrow="Craftsmanship"
         lines={['Made slowly,', <em key="e">by hand.</em>]}
         lead="A piece takes three to four weeks, most of it spent on things you will only notice when you hold it."
       />
@@ -32,9 +31,6 @@ export default function CraftsmanshipPage() {
       <section className="container" style={{ paddingBlock: 'clamp(100px, 12vw, 180px)' }} aria-labelledby="process-title">
         <div className="grid" style={{ rowGap: 48 }}>
           <div style={{ gridColumn: '1 / span 4' }} className="proc-head">
-            <p className="eyebrow" style={{ marginBottom: 24 }}>
-              The process
-            </p>
             <h2 id="process-title" className="h2">
               Seven stages, in order.
             </h2>

@@ -18,7 +18,7 @@ const featured = products.filter((p) => p.featured);
  * The collection as an editorial index: one piece at a time, large, in 3D.
  * Choosing another piece transforms the object in place rather than swapping a picture.
  */
-export default function Collection({ eyebrow = '07 — The Collection' }: { eyebrow?: string }) {
+export default function Collection() {
   const [index, setIndex] = useState(0);
   const [changing, setChanging] = useState(false);
   const product = featured[index];
@@ -35,9 +35,6 @@ export default function Collection({ eyebrow = '07 — The Collection' }: { eyeb
       <div className="container">
         <div className={`grid ${styles.head}`}>
           <div className={styles.headTitle}>
-            <p className="eyebrow" style={{ marginBottom: 28 }}>
-              {eyebrow}
-            </p>
             <MaskedLines as="h2" className="h1" lines={['One stone,', <em key="e">one setting.</em>]} />
             <span id="collection-title" className="visually-hidden">
               The collection
@@ -61,7 +58,6 @@ export default function Collection({ eyebrow = '07 — The Collection' }: { eyeb
           </div>
 
           <div className={`${styles.meta} ${styles.fade}`} data-changing={changing}>
-            <p className="eyebrow">{product.subtitle}</p>
             <p className={styles.metaName}>{gem.name}</p>
             <div className={`${styles.specs} micro muted`}>
               <span>

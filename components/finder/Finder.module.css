@@ -196,9 +196,6 @@
   font-size: var(--fs-small);
 }
 .facts dt {
-  font-size: var(--fs-micro);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--muted);
   padding-top: 2px;
 }

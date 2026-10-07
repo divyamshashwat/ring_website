@@ -7,7 +7,6 @@ export const metadata: Metadata = pageMetadata({ title: 'Shipping', description:
 export default function ShippingPage() {
   return (
     <InfoPage
-      eyebrow="Client care"
       title={['Shipping.']}
       lead="Every piece is made to order and delivered fully insured."
       sections={[

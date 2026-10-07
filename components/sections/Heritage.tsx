@@ -46,9 +46,6 @@ export default function Heritage() {
     <section className={styles.section} aria-labelledby="heritage-title">
       <div className="container">
         <div className="grid">
-          <p className="eyebrow" style={{ gridColumn: '1 / -1', textAlign: 'center', marginBottom: 36 }}>
-            06 — Heritage
-          </p>
           <MaskedLines as="h2" className={`serif ${styles.title}`} lines={['Ancient knowledge.', <em key="e">Contemporary form.</em>]} />
           <span id="heritage-title" className="visually-hidden">
             Ancient knowledge, contemporary form

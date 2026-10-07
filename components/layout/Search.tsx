@@ -66,7 +66,7 @@ export default function Search() {
             </div>
             <div className={styles.results}>
               <section className={styles.group}>
-                <h2 className="eyebrow">Pieces</h2>
+                <h2 className="label">Pieces</h2>
                 <ul>
                   {results.pieces.map((p) => (
                     <li key={p.slug}>
@@ -80,7 +80,7 @@ export default function Search() {
                 </ul>
               </section>
               <section className={styles.group}>
-                <h2 className="eyebrow">Gemstones</h2>
+                <h2 className="label">Gemstones</h2>
                 <ul>
                   {results.stones.map((g) => (
                     <li key={g.slug}>
@@ -94,7 +94,7 @@ export default function Search() {
                 </ul>
               </section>
               <section className={styles.group}>
-                <h2 className="eyebrow">Journal</h2>
+                <h2 className="label">Journal</h2>
                 <ul>
                   {results.journal.map((a) => (
                     <li key={a.slug}>

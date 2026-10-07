@@ -30,7 +30,6 @@
 }
 .numeral {
   font-family: var(--font-serif);
-  font-style: italic;
   color: var(--gold);
   font-size: 1.15rem;
 }

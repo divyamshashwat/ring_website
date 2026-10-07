@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Track an Order', robots: { index: fa
 export default function TrackOrderPage() {
   return (
     <>
-      <PageIntro eyebrow="Order tracking" lines={['Where your piece is.']} compact />
+      <PageIntro lines={['Where your piece is.']} compact />
       <div className="container" style={{ paddingBottom: 'clamp(100px, 12vw, 180px)' }}>
         <div style={{ maxWidth: 820 }}>
           <TrackOrderForm />

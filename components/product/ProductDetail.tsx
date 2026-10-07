@@ -54,9 +54,6 @@ export default function ProductDetail({ product, related }: { product: Product; 
             <span aria-current="page">{gem.name}</span>
           </nav>
           <div>
-            <p className="eyebrow" style={{ marginBottom: 18 }}>
-              {product.subtitle}
-            </p>
             <h1 className={styles.name}>{product.name}</h1>
             <p className="lead" style={{ marginTop: 14 }}>
               {gem.englishName} · {product.configuration.purity.toUpperCase()} {metal.label}
@@ -70,7 +67,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
           {product.type === 'ring' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                <span className="eyebrow">Select size</span>
+                <span className="label">Select size</span>
                 <TransitionLink href="/care#sizing" className="micro muted">
                   Size guide
                 </TransitionLink>
@@ -142,9 +139,9 @@ export default function ProductDetail({ product, related }: { product: Product; 
       <div className={`container ${styles.sections}`}>
         <section className="grid" aria-labelledby="story-title">
           <div className={styles.story}>
-            <p className="eyebrow" style={{ marginBottom: 28 }} id="story-title">
+            <h2 className="visually-hidden" id="story-title">
               The story
-            </p>
+            </h2>
             <MaskedLines as="p" className="h2" lines={[product.description]} />
             <Reveal>
               <p className="lead" style={{ marginTop: 36 }}>
@@ -156,7 +153,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
 
         <section className={`grid ${styles.split}`} aria-label="About the stone">
           <div>
-            <p className="eyebrow">What we can verify</p>
+            <p className="label">What we can verify</p>
             <dl className={styles.facts}>
               <div>
                 <dt>Species</dt>
@@ -186,7 +183,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
             <p className="small muted">{gem.gemmology.treatments}</p>
           </div>
           <div>
-            <p className="eyebrow">What tradition holds</p>
+            <p className="label">What tradition holds</p>
             <p className="h3">
               {gem.name}, {gem.epithet.toLowerCase()}.
             </p>

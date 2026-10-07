@@ -80,7 +80,7 @@ export default function BagView() {
         ))}
       </ul>
       <aside className={styles.summary} aria-label="Summary">
-        <p className="eyebrow">Summary</p>
+        <p className="label">Summary</p>
         <div className={styles.row}>
           <span>Subtotal</span>
           <span>{formatPrice(total)}</span>
@@ -94,7 +94,7 @@ export default function BagView() {
           <span>Included</span>
         </div>
         <div className={styles.total}>
-          <span className="eyebrow">Total</span>
+          <span className="label">Total</span>
           <strong>{formatPrice(total)}</strong>
         </div>
         <TransitionLink href="/checkout" className="btn btn--solid btn--block">

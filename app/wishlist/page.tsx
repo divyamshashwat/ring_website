@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Wishlist', robots: { index: false } 
 export default function WishlistPage() {
   return (
     <>
-      <PageIntro eyebrow="Wishlist" lines={['Kept for later.']} compact />
+      <PageIntro lines={['Kept for later.']} compact />
       <div className="container" style={{ paddingBottom: 'clamp(100px, 12vw, 180px)' }}>
         <Wishlist />
       </div>

@@ -26,7 +26,7 @@ const FORMS: { id: JewelleryType; label: string; line: string }[] = [
 
 type Step = 0 | 1 | 2 | 3;
 
-export default function FindYourStone({ headingLevel = 'h2', eyebrow = '03 — Find your stone' }: { headingLevel?: 'h1' | 'h2'; eyebrow?: string }) {
+export default function FindYourStone({ headingLevel = 'h2' }: { headingLevel?: 'h1' | 'h2' }) {
   const [step, setStep] = useState<Step>(0);
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
@@ -100,7 +100,7 @@ export default function FindYourStone({ headingLevel = 'h2', eyebrow = '03 — F
     <section ref={root} className={styles.finder} aria-labelledby="finder-title" id="find-your-stone">
       <div className="container">
         <div className={styles.top}>
-          <p className="eyebrow">{eyebrow}</p>
+          <span />
           <div className={styles.steps} aria-label={`Step ${step + 1} of 4`}>
             {[0, 1, 2, 3].map((i) => (
               <span key={i} data-done={i <= step} />
@@ -172,7 +172,6 @@ export default function FindYourStone({ headingLevel = 'h2', eyebrow = '03 — F
           {step === 1 && (
             <div className={styles.step}>
               <div className={styles.question}>
-                <span className={`${styles.number} eyebrow`}>02 / 04</span>
                 <h3 className="h1">Tell us your preference.</h3>
               </div>
               <div className={styles.answer} role="radiogroup" aria-label="Form of jewellery">
@@ -213,7 +212,6 @@ export default function FindYourStone({ headingLevel = 'h2', eyebrow = '03 — F
           {step === 2 && (
             <div className={styles.step}>
               <div className={styles.question}>
-                <span className={`${styles.number} eyebrow`}>03 / 04</span>
                 <h3 className="h1">Your intention.</h3>
                 <p className="body" style={{ marginTop: 24 }}>
                   Choose up to two. These are the qualities tradition associates with each stone — a way of choosing, not a promise of outcome.
@@ -256,10 +254,9 @@ export default function FindYourStone({ headingLevel = 'h2', eyebrow = '03 — F
                 <GemstoneViewer slug={result.primary.slug} label={`${result.primary.englishName}, interactive 3D gemstone`} />
               </div>
               <div className={styles.resultText}>
-                <p className="eyebrow">Your stone</p>
                 <div>
                   <h3 className={styles.resultName}>{result.primary.name}</h3>
-                  <p className="h3 italic" style={{ marginTop: 10 }}>
+                  <p className="h3" style={{ marginTop: 10 }}>
                     {result.primary.englishName}
                   </p>
                 </div>

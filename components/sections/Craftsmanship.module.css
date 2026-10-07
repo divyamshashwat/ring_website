@@ -12,14 +12,17 @@
 }
 .canvas {
   position: absolute;
-  inset: 0 0 0 30%;
+  top: var(--header-h);
+  bottom: 0;
+  right: 0;
+  left: calc(var(--margin) + min(380px, 27vw) + 56px);
 }
 .text {
   position: absolute;
   left: var(--margin);
   top: 50%;
   transform: translateY(-50%);
-  width: min(400px, 28vw);
+  width: min(380px, 27vw);
   display: grid;
   gap: 28px;
   pointer-events: none;
@@ -81,16 +84,19 @@
 }
 @media (max-width: 900px) {
   .canvas {
-    inset: 0;
+    left: 0;
+    bottom: auto;
+    height: calc((100svh - var(--header-h)) * 0.55);
   }
   .text {
-    top: auto;
-    bottom: 6vh;
+    top: calc(var(--header-h) + (100svh - var(--header-h)) * 0.58);
     transform: none;
     width: auto;
     right: var(--margin);
-    background: linear-gradient(0deg, var(--porcelain) 60%, transparent);
-    padding-top: 40px;
+    gap: 14px;
+  }
+  .text h2 {
+    font-size: 1.9rem;
   }
   .stops {
     min-height: 150px;

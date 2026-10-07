@@ -67,6 +67,59 @@ export function parametricSurface(
   return geometry;
 }
 
+/** Set to an array to record outward fractions (geometry QA only). */
+export let orientationLog: number[] | null = null;
+export const recordOrientation = (log: number[] | null) => {
+  orientationLog = log;
+};
+
+/**
+ * Makes a surface face outward: if most triangles point toward `centre(p)`,
+ * the winding is reversed and the normals negated. Returns the outward fraction
+ * measured before any flip (used by the geometry QA script).
+ */
+export function orientOutward(geometry: BufferGeometry, centre: (p: Vector3, target: Vector3) => Vector3): number {
+  const pos = geometry.getAttribute('position') as BufferAttribute;
+  const index = geometry.index!;
+  const a = new Vector3();
+  const b = new Vector3();
+  const c = new Vector3();
+  const m = new Vector3();
+  const k = new Vector3();
+  const e1 = new Vector3();
+  const e2 = new Vector3();
+  let out = 0;
+  let total = 0;
+  for (let i = 0; i < index.count; i += 3) {
+    a.fromBufferAttribute(pos, index.getX(i));
+    b.fromBufferAttribute(pos, index.getX(i + 1));
+    c.fromBufferAttribute(pos, index.getX(i + 2));
+    e1.subVectors(b, a);
+    e2.subVectors(c, a);
+    e1.cross(e2);
+    if (e1.lengthSq() < 1e-16) continue;
+    m.copy(a).add(b).add(c).divideScalar(3);
+    centre(m, k);
+    if (e1.dot(m.sub(k)) > 0) out++;
+    total++;
+  }
+  const fraction = total ? out / total : 1;
+  orientationLog?.push(fraction);
+  if (fraction < 0.5) {
+    const arr = index.array as Uint16Array | Uint32Array;
+    for (let i = 0; i < arr.length; i += 3) {
+      const t = arr[i + 1];
+      arr[i + 1] = arr[i + 2];
+      arr[i + 2] = t;
+    }
+    index.needsUpdate = true;
+    const normals = geometry.getAttribute('normal') as BufferAttribute;
+    for (let i = 0; i < normals.array.length; i++) (normals.array as Float32Array)[i] *= -1;
+    normals.needsUpdate = true;
+  }
+  return fraction;
+}
+
 /** Flat-shaded faceted geometry from triangles (used for cut gemstones). */
 export function facetedGeometry(triangles: number[][]): BufferGeometry {
   const positions = new Float32Array(triangles.length * 9);

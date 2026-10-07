@@ -103,7 +103,6 @@ export default function Craftsmanship() {
             <CraftScene driver={driver} onLayout={onLayout} />
           </div>
           <div className={styles.text}>
-            <p className="eyebrow">05 — Craftsmanship</p>
             <MaskedLines as="h2" className="h2" lines={['Crafted down to', <em key="e">the smallest detail.</em>]} />
             <span id="craft-title" className="visually-hidden">
               Crafted down to the smallest detail

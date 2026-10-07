@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
 export default function OurStoryPage() {
   return (
     <>
-      <PageIntro eyebrow="Our Story" lines={['Vyoma —', <em key="e">the open sky.</em>]} lead="In Sanskrit, vyoma is the sky, the space in which the planets move. We named the house for it." />
+      <PageIntro lines={['Vyoma —', <em key="e">the open sky.</em>]} lead="In Sanskrit, vyoma is the sky, the space in which the planets move. We named the house for it." />
       <section className="container" style={{ paddingBottom: 'clamp(90px, 11vw, 160px)' }}>
         <div className="grid" style={{ rowGap: 56, alignItems: 'center' }}>
           <MaskReveal style={{ gridColumn: '1 / span 6' }} className="story-img">

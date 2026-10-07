@@ -13,7 +13,6 @@
   letter-spacing: -0.02em;
 }
 .statement em {
-  font-style: italic;
   color: var(--gold);
 }
 .aside {

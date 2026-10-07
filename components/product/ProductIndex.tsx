@@ -41,7 +41,6 @@ export default function ProductIndex({ products }: { products: Product[] }) {
                 <ProductImage product={p} priority={i < 2} sizes="(max-width: 900px) 100vw, 58vw" />
               </TransitionLink>
               <div className={styles.text}>
-                <p className="eyebrow">{p.subtitle}</p>
                 <h2 className={styles.name}>{gem.name}</h2>
                 <div className={`${styles.specs} micro muted`}>
                   <span>

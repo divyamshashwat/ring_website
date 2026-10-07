@@ -180,8 +180,12 @@ ol {
   letter-spacing: -0.005em;
 }
 
+/* The house sets no italics. */
+em,
+i,
+cite,
 .italic {
-  font-style: italic;
+  font-style: normal;
 }
 
 .lead {
@@ -191,12 +195,11 @@ ol {
   font-weight: 300;
 }
 
-.eyebrow {
+.label {
   font-family: var(--font-sans);
-  font-size: var(--fs-micro);
+  font-size: var(--fs-small);
   font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--ink-soft);
   line-height: 1.4;
 }

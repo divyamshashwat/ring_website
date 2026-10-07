@@ -19,7 +19,6 @@ export default async function GemstonesPage() {
   return (
     <>
       <PageIntro
-        eyebrow="Gemstones"
         lines={['The stones,', <em key="e">and what is known of them.</em>]}
         lead="For each stone: what gemmology can verify, and — kept separate — what Vedic tradition holds."
       />

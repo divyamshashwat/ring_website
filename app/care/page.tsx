@@ -9,7 +9,6 @@ export const metadata: Metadata = pageMetadata({ title: 'Care and Sizing', descr
 export default function CarePage() {
   return (
     <InfoPage
-      eyebrow="Client care"
       title={['Care and sizing.']}
       sections={[
         {

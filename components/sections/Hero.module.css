@@ -10,14 +10,14 @@
   height: 100svh;
   overflow: hidden;
 }
+/* the 3D stage never sits beneath the header */
 .canvas {
   position: absolute;
-  inset: 0;
+  inset: var(--header-h) 0 0 0;
 }
 .canvas canvas {
   touch-action: pan-y;
 }
-/* the warm pool of light the ring floats in */
 .glow {
   position: absolute;
   inset: 0;
@@ -37,17 +37,13 @@
   position: absolute;
   left: var(--margin);
   top: 50%;
-  transform: translateY(-46%);
-  width: min(560px, 42vw);
+  transform: translateY(-42%);
+  width: min(520px, 38vw);
   display: grid;
   gap: 30px;
 }
 .title {
-  font-size: clamp(3.2rem, 6.1vw, 6.6rem);
-}
-.title em {
-  font-style: italic;
-  font-weight: 300;
+  font-size: clamp(3rem, 5.6vw, 6.2rem);
 }
 .copy {
   max-width: 25.5em;
@@ -58,24 +54,6 @@
   align-items: center;
   gap: 18px 32px;
   margin-top: 8px;
-}
-.label {
-  position: absolute;
-  right: var(--margin);
-  bottom: 40px;
-  text-align: right;
-  display: grid;
-  gap: 6px;
-}
-.dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #b4442c;
-  margin-right: 10px;
-  vertical-align: middle;
-  box-shadow: 0 0 0 4px rgba(180, 68, 44, 0.12);
 }
 .scroll {
   position: absolute;
@@ -106,39 +84,18 @@
     transform: translateX(100%);
   }
 }
-.caption {
-  position: absolute;
-  left: 50%;
-  bottom: 9vh;
-  transform: translateX(-50%);
-  text-align: center;
-  white-space: nowrap;
-  opacity: 0;
-}
-.macro {
-  position: absolute;
-  left: var(--margin);
-  bottom: 14vh;
-  max-width: 300px;
-  opacity: 0;
-}
 .stoneTitle {
   position: absolute;
   left: var(--margin);
-  top: 50%;
+  top: calc(50% + var(--header-h) / 2);
   transform: translateY(-50%);
-  width: min(440px, 34vw);
-}
-.stoneTitle :global(.eyebrow) {
-  margin-bottom: 26px;
-  opacity: 0;
+  width: min(400px, 30vw);
 }
 .panel {
   position: absolute;
   right: var(--margin);
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(320px, 26vw);
+  top: calc(var(--header-h) + max(32px, (100svh - var(--header-h) - 560px) / 2));
+  width: clamp(270px, 26vw, 330px);
   opacity: 0;
 }
 .panel dl {
@@ -149,16 +106,12 @@
   display: grid;
   grid-template-columns: 7.5em 1fr;
   gap: 12px;
-  padding: 13px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--hairline);
   font-size: var(--fs-small);
 }
 .panel dt {
-  font-size: var(--fs-micro);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
   color: var(--muted);
-  padding-top: 2px;
 }
 .panel dd {
   color: var(--ink);
@@ -176,18 +129,10 @@
   line-height: 1.55;
 }
 .drag {
-  position: absolute;
-  left: 50%;
-  bottom: 7vh;
-  transform: translateX(-50%);
-  opacity: 0;
+  margin-top: 18px;
   display: flex;
   align-items: center;
-  gap: 14px;
-}
-.dragArrows {
-  display: inline-flex;
-  gap: 4px;
+  gap: 12px;
 }
 .rail {
   position: absolute;
@@ -206,60 +151,42 @@
   transform: scaleY(0);
 }
 
-@media (max-width: 819px) {
-  .glow {
-    background: radial-gradient(80% 45% at 50% 32%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
-  }
-  .intro {
-    left: var(--margin);
-    right: var(--margin);
-    top: auto;
-    bottom: 13vh;
-    transform: none;
-    width: auto;
-    gap: 18px;
-  }
-  .title {
-    font-size: clamp(2.7rem, 11.5vw, 3.6rem);
-  }
-  .copy {
-    display: none;
-  }
-  .label {
-    display: none;
-  }
-  .scroll {
-    bottom: 28px;
-  }
-  .stoneTitle {
-    top: calc(var(--header-h) + 24px);
-    transform: none;
-    width: auto;
-    right: var(--margin);
-  }
-  .panel {
-    top: auto;
-    bottom: 5vh;
-    transform: none;
-    left: var(--margin);
-    right: var(--margin);
-    width: auto;
-  }
+/* short desktop windows: a denser panel that always fits below the header */
+@media (min-width: 820px) and (max-height: 860px) {
   .panel dl > div {
     padding: 8px 0;
   }
-  .note,
-  .drag,
-  .rail {
+  .note {
     display: none;
   }
-  .caption {
-    bottom: 6vh;
-    white-space: normal;
-    width: 80vw;
+}
+
+/* Portrait / mobile: the 3D stage takes the upper band, all text lives below it. */
+@media (max-width: 819px) {
+  .canvas {
+    inset: var(--header-h) 0 auto 0;
+    height: calc((100svh - var(--header-h)) * 0.56);
   }
-  .macro {
-    bottom: 8vh;
+  .glow {
+    background: radial-gradient(80% 40% at 50% 32%, #fffdf8 0%, rgba(255, 253, 248, 0) 70%);
+  }
+  .intro,
+  .stoneTitle {
+    left: var(--margin);
     right: var(--margin);
+    top: calc(var(--header-h) + (100svh - var(--header-h)) * 0.58);
+    bottom: auto;
+    transform: none;
+    width: auto;
+    gap: 16px;
+  }
+  .title {
+    font-size: clamp(2.5rem, 11vw, 3.4rem);
+  }
+  .copy,
+  .scroll,
+  .panel,
+  .rail {
+    display: none;
   }
 }

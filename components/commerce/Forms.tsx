@@ -28,7 +28,7 @@ export function ConsultationForm() {
   if (state === 'done') {
     return (
       <div className={styles.done} role="status">
-        <p className="eyebrow">Request received</p>
+        <p className="label">Request received</p>
         <p className="h2">We will be in touch within one working day.</p>
         <p className="body">A member of the atelier will write to {form.email} to confirm a time.</p>
       </div>
@@ -52,7 +52,7 @@ export function ConsultationForm() {
       }}
     >
       <fieldset className={styles.fieldset}>
-        <legend className="eyebrow">How would you like to meet?</legend>
+        <legend className="label">How would you like to meet?</legend>
         <div className={styles.options} role="radiogroup" aria-label="Consultation format">
           {MODES.map((m) => (
             <button key={m.id} type="button" role="radio" aria-checked={mode === m.id} className={styles.option} onClick={() => setMode(m.id)}>
@@ -219,7 +219,7 @@ export function TrackOrderForm() {
       </form>
       {result && (
         <div className={styles.done} role="status">
-          <p className="eyebrow">Order {result.id}</p>
+          <p className="label">Order {result.id}</p>
           <p className="h3">{STATUS[result.status] ?? result.status}</p>
           <p className="small muted">Placed {new Date(result.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>

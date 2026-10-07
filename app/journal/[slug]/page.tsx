@@ -26,7 +26,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <article>
       <header className="container" style={{ paddingTop: 'calc(var(--header-h) + clamp(64px, 9vw, 140px))', paddingBottom: 'clamp(48px, 6vw, 90px)' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'grid', gap: 28, textAlign: 'center', justifyItems: 'center' }}>
-          <p className="eyebrow">
+          <p className="small muted">
             {article.category} · {new Date(article.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })} · {article.readingMinutes} min read
           </p>
           <MaskedLines as="h1" className="display balance" lines={[article.title]} immediate />

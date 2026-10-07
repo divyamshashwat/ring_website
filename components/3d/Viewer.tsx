@@ -132,6 +132,7 @@ export default function Viewer({
   const [autoOn, setAutoOn] = useState(autoDefault);
   return (
     <div className={`${styles.viewer} ${className ?? ''}`} data-lenis-prevent={wheelZoom ? '' : undefined} data-cursor="rotate">
+      <div className={styles.canvasArea}>
       <Stage style={{ position: 'absolute', inset: 0 }} camera={{ position: pose.position, fov: pose.fov }} ariaLabel={label}>
         <MaterialLibraryProvider metal={metal} purity={purity}>
           <StudioEnvironment />
@@ -144,6 +145,7 @@ export default function Viewer({
           {extras}
         </MaterialLibraryProvider>
       </Stage>
+      </div>
       {controls && (
         <div className={styles.controls} data-cursor="default">
           <span className={`${styles.hint} micro`}>Drag to rotate</span>

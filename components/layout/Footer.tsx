@@ -23,7 +23,7 @@ export default function Footer() {
         <div className={`grid ${styles.cols}`}>
           {FOOTER_NAV.map((group) => (
             <nav key={group.title} className={styles.col} aria-label={group.title}>
-              <h2 className="eyebrow">{group.title}</h2>
+              <h2 className="label">{group.title}</h2>
               <ul>
                 {group.links.map((l) => (
                   <li key={l.href}>
@@ -34,7 +34,7 @@ export default function Footer() {
             </nav>
           ))}
           <nav className={styles.col} aria-label="Social">
-            <h2 className="eyebrow">Follow</h2>
+            <h2 className="label">Follow</h2>
             <ul>
               <li>
                 <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">
@@ -54,7 +54,7 @@ export default function Footer() {
             </ul>
           </nav>
           <div className={styles.col}>
-            <h2 className="eyebrow">The atelier</h2>
+            <h2 className="label">The atelier</h2>
             <p className="small muted">
               Consultations by appointment,
               <br />

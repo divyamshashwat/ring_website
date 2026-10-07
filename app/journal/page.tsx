@@ -18,7 +18,7 @@ export default async function JournalPage() {
   const leadGem = lead.stone ? gemstoneBySlug(lead.stone) : null;
   return (
     <>
-      <PageIntro eyebrow="The Journal" lines={['Notes on stone,', <em key="e">tradition and craft.</em>]} compact />
+      <PageIntro lines={['Notes on stone,', <em key="e">tradition and craft.</em>]} compact />
       <section className="container" style={{ paddingBottom: 'clamp(100px, 12vw, 180px)' }}>
         <TransitionLink
           href={`/journal/${lead.slug}`}
@@ -53,7 +53,7 @@ export default async function JournalPage() {
           .journal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gutter); }
           .journal-grid li a { display: grid; gap: 14px; padding: 40px 0; border-bottom: 1px solid var(--hairline); transition: padding .7s var(--ease); }
           .journal-grid li a:hover { padding-left: 10px; }
-          .journal-lead:hover .display { font-style: italic; }
+          .journal-lead:hover .display { color: var(--ink-soft); }
           @media (max-width: 800px) { .journal-grid { grid-template-columns: 1fr; } }
         `}</style>
       </section>
