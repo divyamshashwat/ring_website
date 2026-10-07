@@ -49,21 +49,19 @@ export interface GemSpec {
 
 export const GEM_SPECS: Record<string, GemSpec> = {
   moonga: {
-    color: '#a82c16',
-    envMapIntensity: 0.5,
-    specularIntensity: 0.6,
+    color: '#c5452b',
     roughness: 0.16,
     transmission: 0.16,
     thickness: 0.6,
     ior: 1.55,
     attenuationColor: '#a3200f',
     attenuationDistance: 0.25,
-    clearcoat: 0.55,
+    clearcoat: 0.7,
     clearcoatRoughness: 0.1,
     effects: { variation: { scale: 5, strength: 0.16, growthLines: true }, sss: { color: '#ff4f22', strength: 0.07 } },
   },
   manik: {
-    refraction: { color: '#e8101f', ior: 1.76, bounces: 3, aberration: 0.006, gain: 1.0 },
+    refraction: { color: '#ff2a44', ior: 1.76, bounces: 3, aberration: 0.006, gain: 1.15 },
     color: '#ff7480',
     roughness: 0.02,
     transmission: 1,
@@ -90,7 +88,7 @@ export const GEM_SPECS: Record<string, GemSpec> = {
     effects: { sss: { color: '#ffeedd', strength: 0.05 }, variation: { scale: 3, strength: 0.05 } },
   },
   panna: {
-    refraction: { color: '#14a464', ior: 1.58, bounces: 2, aberration: 0.003, gain: 1.15 },
+    refraction: { color: '#1fb072', ior: 1.58, bounces: 2, aberration: 0.003, gain: 1.3 },
     color: '#a6e3be',
     roughness: 0.04,
     transmission: 0.93,
@@ -223,15 +221,13 @@ const vec3 = (hex: string) => {
   return new Vector3(c.r, c.g, c.b);
 };
 
-export function createGemMaterial(slug: string, options: { transmission?: boolean } = {}): GemMaterial {
+export function createGemMaterial(slug: string): GemMaterial {
   const spec = GEM_SPECS[slug] ?? GEM_SPECS.moonga;
-  // partial transmission (coral, cat's eye, moonstone) is a subtle depth cue; it can be dropped on phones
-  const transmission = options.transmission === false && (spec.transmission ?? 0) < 0.9 ? 0 : (spec.transmission ?? 0);
   const material = new MeshPhysicalMaterial({
     color: spec.color,
     roughness: spec.roughness,
     metalness: 0,
-    transmission,
+    transmission: spec.transmission ?? 0,
     thickness: spec.thickness ?? 0,
     ior: spec.ior ?? 1.5,
     attenuationColor: spec.attenuationColor ? new Color(spec.attenuationColor) : new Color('#ffffff'),
@@ -245,8 +241,7 @@ export function createGemMaterial(slug: string, options: { transmission?: boolea
     sheen: spec.sheen ?? 0,
     sheenColor: spec.sheenColor ? new Color(spec.sheenColor) : new Color('#000000'),
     sheenRoughness: spec.sheenRoughness ?? 1,
-    // opaque stones are lit by the bright metal light box: a lower gain keeps their body colour deep
-    envMapIntensity: spec.envMapIntensity ?? (spec.tentLit ? 1.3 : 0.62),
+    envMapIntensity: spec.envMapIntensity ?? 1.3,
     specularIntensity: spec.specularIntensity ?? 1,
   }) as GemMaterial;
   material.name = `Stone:${slug}`;

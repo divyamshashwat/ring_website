@@ -1,5 +1,6 @@
 'use client';
 
+import { ContactShadows } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import gsap from 'gsap';
 import { useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from 'react';
@@ -11,7 +12,7 @@ import CameraRig, { type ZoomRef } from './CameraRig';
 import StudioEnvironment from './Environment';
 import LightingRig from './LightingRig';
 import { MaterialLibraryProvider } from './MaterialLibrary';
-import SoftShadow from './SoftShadow';
+import { useQuality } from './QualityContext';
 import Stage from './Stage';
 import { armTurn, stepDragRotation, useDragRotation } from './useDragRotation';
 import styles from './Viewer.module.css';
@@ -179,5 +180,7 @@ export default function Viewer({
 }
 
 function ShadowFloor({ y }: { y: number }) {
-  return <SoftShadow y={y} width={3.4} depth={1.7} opacity={0.3} />;
+  const quality = useQuality();
+  if (quality === 'low') return null;
+  return <ContactShadows position={[0, y, 0]} opacity={0.28} scale={7} blur={2.8} far={2.6} resolution={quality === 'high' ? 512 : 256} color="#4b3b2b" frames={Infinity} />;
 }

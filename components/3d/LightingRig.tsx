@@ -54,10 +54,9 @@ export default function LightingRig({ follow = 0.18, drift = 0.06, baseRotation 
 
   return (
     <>
-      {/* the light box does most of the work; these only add a sparkle and shape the stones */}
-      <ambientLight intensity={0.04} color="#fff7ee" />
-      <directionalLight ref={key} intensity={0.7} color="#fff5e8" position={[2.2, 5, 3.2]} />
-      <directionalLight intensity={0.25} color="#ffffff" position={[-4, 1.5, -3]} />
+      <ambientLight intensity={0.12} color="#fff7ee" />
+      <directionalLight ref={key} intensity={1.1} color="#fff5e8" position={[2.2, 5, 3.2]} />
+      <directionalLight intensity={0.55} color="#ffffff" position={[-4, 1.5, -3]} />
       <pointLight ref={sweep} intensity={0} distance={10} decay={1.4} color="#fffaf0" position={[-3, 2.4, 2.5]} />
     </>
   );

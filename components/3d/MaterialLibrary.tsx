@@ -36,10 +36,9 @@ export function useMaterials() {
 export function MaterialLibraryProvider({ children, metal = 'yellow-gold', purity = '22k' }: { children: ReactNode; metal?: MetalId; purity?: Purity }) {
   const lib = useMemo(() => {
     const textures: Texture[] = [];
-    // phones skip the partial-transmission pass (a second render of the scene every frame)
-    const lightTier = detectQuality() === 'low';
-    const scratches = createScratchTexture(1024);
-    const hallmark: CanvasTexture = createHallmarkTexture(`VYOMA  ${purity.toUpperCase()}`, 2048);
+    const light = detectQuality() !== 'high';
+    const scratches = createScratchTexture(light ? 512 : 1024);
+    const hallmark: CanvasTexture = createHallmarkTexture(`VYOMA  ${purity.toUpperCase()}`, light ? 1024 : 2048);
     textures.push(scratches, hallmark);
     const metalMaterial = createMetalMaterial(metal, purity, { roughness: scratches });
     const shank = createMetalMaterial(metal, purity, { roughness: scratches, bump: hallmark });
@@ -53,7 +52,7 @@ export function MaterialLibraryProvider({ children, metal = 'yellow-gold', purit
       gem(slug) {
         let m = gems.get(slug);
         if (!m) {
-          m = createGemMaterial(slug, { transmission: !lightTier });
+          m = createGemMaterial(slug);
           gems.set(slug, m);
         }
         return m;
